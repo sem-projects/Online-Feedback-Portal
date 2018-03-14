@@ -1,13 +1,28 @@
-from flask import Flask,render_template,redirect, url_for
+from flask import Flask,render_template,redirect, url_for, request
+import sqlite3
 app = Flask(__name__, static_url_path='/static')
+
+
+conn = sqlite3.connect('database.db')
+print ("Opened database successfully")
+
+conn.execute('CREATE TABLE IF NOT EXISTS students (name TEXT, addr TEXT, city TEXT, pin TEXT)')
+print ("Table created successfully")
+conn.close()
 
 @app.route('/')
 def index():
    return redirect(url_for('login'))
 
-@app.route('/login')
+@app.route('/login',methods = ['GET','POST'])
 def login():
+
+	if request.method == 'POST':
+		username=request.form['username']
+		password=request.form['pass']
+		
 	return render_template("login.html")
+      
 
 
 @app.route('/register')
