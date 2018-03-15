@@ -30,11 +30,13 @@
 <body background = "/static/back4.jpg" style="background-repeat: no-repeat;
   background-position: center;
     	 width: 100%;background-size:100% 100%;">
-	
+	{% if message is not none %}
+    <h2>{{message}}</h2>
+	{% endif %}
 	<div class="limiter" style="opacity:0.98;height:100%;padding:50px;">
 		<div class="container-login100" style="opacity:0.98;" >
 			<div class="wrap-login100" style="background:#3d4949">
-				<form class="login100-form validate-form">
+				<form class="login100-form validate-form" method = "POST">
 					<span class="login100-form-title p-b-34 p-t-27" style="opacity:1">
 						Student Register
 					</span>
@@ -47,27 +49,27 @@
 
 					<div class="wrap-input100 validate-input" data-validate="Enter Date Of Birth">
 						<label class="label">Date Of Birth :</label>
-						<input class="input100" type="date" name="pass1" placeholder="">
+						<input class="input100" type="date" name="dob" placeholder="">
 						<span class="focus-input100" data-placeholder="&#xf191;"></span>
 					</div>
 					<div class="wrap-input100 validate-input" data-validate="Enter Email">
 						<label class="label">E-mail :</label>
-						<input class="input100" type="email" name="pass2" >
+						<input class="input100" type="email" name="email" >
 						<span class="focus-input100" data-placeholder="&#xf191;"></span>
 					</div>
 					<div class="wrap-input100 validate-input" data-validate="Enter password">
 						<label class="label">Password :</label>
-						<input class="input100" type="password" name="pass3">
+						<input class="input100" type="password" name="pass">
 						<span class="focus-input100" data-placeholder="&#xf191;"></span>
 					</div>
 					<div class="wrap-input100 validate-input" data-validate="Enter password">
 						<label class="label">Confirm Password :</label>
-						<input class="input100" type="password" name="pass">
+						<input class="input100" type="password" name="passc">
 						<span class="focus-input100" data-placeholder="&#xf191;"></span>
 					</div>
 
 					<div class="container-login100-form-btn">
-						<button class="login100-form-btn">
+						<button type = "submit" class="login100-form-btn">
 							Register Me!
 						</button>
 					</div>

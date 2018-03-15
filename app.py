@@ -8,28 +8,22 @@ conn = sqlite3.connect('database.db')
 print ("Opened database successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS users (name TEXT, dob DATE, email TEXT, pass TEXT)')
-print ("Table created successfully")
-conn.close()
-
+print ("USERS Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS admin (email TEXT, pass TEXT)')
-print ("Table created successfully")
-conn.close()
+print ("ADMIN Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS courses (code TEXT, credits INT, department TEXT)')
-print ("Table created successfully")
-conn.close()
+print ("COURSES Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS query_feedback (faculty_email TEXT,student_email TEXT, course_code TEXT,feedback TEXT, query TEXT,reply_to_query TEXT)')
-print ("Table created successfully")
-conn.close()
+print ("QUERY_FEEDBACK Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS questions (question TEXT)')
-print ("Table created successfully")
-conn.close()
+print ("QUESTIONS Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS rating (course_code TEXT, question TEXT, faculty_email TEXT,student_email TEXT,rating INT)')
-print ("Table created successfully")
+print ("RATING Table created successfully")
 conn.close()
 
 
@@ -46,9 +40,27 @@ def login():
       
 
 
-@app.route('/register')
+@app.route('/register',methods = ['GET','POST'])
 def register():
-	return render_template("student_register.html")
+	message = None
+	if request.method == 'POST':
+		nm = request.form.get('name','')
+		dob = str(request.form.get('dob',''))
+		email = request.form.get('email','')
+		password=request.form.get('pass','')
+		passwordc=request.form.get('passc','')
+		if password != passwordc:
+			message="password doesn't match"
+			return render_template("student_register.html", message = message)
+        else:
+        	conn = sqlite3.connect('database.db')
+        	cur = conn.cursor()
+        	cur.execute("INSERT INTO USERS (name,dob,email,pass) values (?,?,?,?)",(request.form.get('name',''),str(request.form.get('dob','')),request.form.get('email',''),request.form.get('password')))
+        #	
+        #	print ("insert into user success")
+        #	conn.close()
+        #	return redirect(url_for('login'))	
+	return render_template("student_register.html", message = message)
 
 
 @app.route('/dashboard/<id>')
@@ -57,7 +69,8 @@ def dashboard(id):
 
 
 
+
 if __name__ == '__main__':
-	app.debug = True
+	#app.debug = True
 	app.run()
-	app.run(debug = True)
+	#app.run(debug = True)
