@@ -10,10 +10,10 @@ print ("Opened database successfully")
 conn.execute('CREATE TABLE IF NOT EXISTS users (name TEXT, dob DATE, email TEXT, pass TEXT)')
 print ("USERS Table created successfully")
 
-conn.execute('CREATE TABLE IF NOT EXISTS admin (email TEXT, pass TEXT)')
+conn.execute('CREATE TABLE IF NOT EXISTS admin (email TEXT primary key, pass TEXT)')
 print ("ADMIN Table created successfully")
 
-conn.execute('CREATE TABLE IF NOT EXISTS courses (code TEXT, credits INT, department TEXT)')
+conn.execute('CREATE TABLE IF NOT EXISTS courses (code TEXT primary key, credits INT, department TEXT)')
 print ("COURSES Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS query_feedback (faculty_email TEXT,student_email TEXT, course_code TEXT,feedback TEXT, query TEXT,reply_to_query TEXT)')
@@ -34,8 +34,19 @@ def index():
 @app.route('/login',methods = ['GET','POST'])
 def login():
 	if request.method == 'POST':
-		username=request.form['username']
-		password=request.form['pass']
+		username=request.form.get('username','')
+		password=request.form.get('pass','')
+		conn = sqlite3.connect('database.db')
+		print ("Opened database successfully")
+		curr = conn.cursor()
+		#curr.execute("SELECT count(*) FROM users WHERE email = ?", (request.form.get('username',''),))
+		curr.execute("SELECT count(*) FROM users WHERE email = (?)",(username,))
+		data = curr.fetchone()[0]
+		if data==0:
+			print('There is no component named %s'%request.form.get('username'))
+    	if data !=0:
+        	print('Component %s found in %s row(s)'%(username,data))
+        conn.close()
 	return render_template("login.html")
       
 
@@ -43,25 +54,29 @@ def login():
 @app.route('/register',methods = ['GET','POST'])
 def register():
 	message = None
+	if request.method == 'GET':
+		return render_template("student_register.html", message = message)
 	if request.method == 'POST':
-		nm = request.form.get('name','')
-		dob = str(request.form.get('dob',''))
-		email = request.form.get('email','')
-		password=request.form.get('pass','')
-		passwordc=request.form.get('passc','')
+		nm = request.form.get('name',)
+		dob = str(request.form.get('dob',))
+		email = request.form.get('email',)
+		password=request.form.get('pass',)
+		passwordc=request.form.get('passc',)
 		if password != passwordc:
+			print ("successf")
 			message="password doesn't match"
 			return render_template("student_register.html", message = message)
-        else:
-        	conn = sqlite3.connect('database.db')
-        	cur = conn.cursor()
-        	cur.execute("INSERT INTO USERS (name,dob,email,pass) values (?,?,?,?)",(request.form.get('name',''),str(request.form.get('dob','')),request.form.get('email',''),request.form.get('password')))
-        #	
-        #	print ("insert into user success")
-        #	conn.close()
-        #	return redirect(url_for('login'))	
+        if password == passwordc:
+			print ("success")
+			conn = sqlite3.connect('database.db')
+			cur = conn.cursor()
+			cur.execute("INSERT INTO USERS (name,dob,email,pass) values (?,?,?,?)",\
+				(nm,dob,email,password,))	
+			print ("insert into user success")
+			conn.commit() 
+			conn.close()
+			return redirect(url_for('login'))
 	return render_template("student_register.html", message = message)
-
 
 @app.route('/dashboard/<id>')
 def dashboard(id):
@@ -71,6 +86,6 @@ def dashboard(id):
 
 
 if __name__ == '__main__':
-	#app.debug = True
+	app.debug = True
 	app.run()
-	#app.run(debug = True)
+	app.run(debug = True)
