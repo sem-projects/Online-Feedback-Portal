@@ -7,9 +7,31 @@ app = Flask(__name__, static_url_path='/static')
 conn = sqlite3.connect('database.db')
 print ("Opened database successfully")
 
-conn.execute('CREATE TABLE IF NOT EXISTS students (name TEXT, addr TEXT, city TEXT, pin TEXT)')
+conn.execute('CREATE TABLE IF NOT EXISTS users (name TEXT, dob DATE, email TEXT, pass TEXT)')
 print ("Table created successfully")
 conn.close()
+
+
+conn.execute('CREATE TABLE IF NOT EXISTS admin (email TEXT, pass TEXT)')
+print ("Table created successfully")
+conn.close()
+
+conn.execute('CREATE TABLE IF NOT EXISTS courses (code TEXT, credits INT, department TEXT)')
+print ("Table created successfully")
+conn.close()
+
+conn.execute('CREATE TABLE IF NOT EXISTS query_feedback (faculty_email TEXT,student_email TEXT, course_code TEXT,feedback TEXT, query TEXT,reply_to_query TEXT)')
+print ("Table created successfully")
+conn.close()
+
+conn.execute('CREATE TABLE IF NOT EXISTS questions (question TEXT)')
+print ("Table created successfully")
+conn.close()
+
+conn.execute('CREATE TABLE IF NOT EXISTS rating (course_code TEXT, question TEXT, faculty_email TEXT,student_email TEXT,rating INT)')
+print ("Table created successfully")
+conn.close()
+
 
 @app.route('/')
 def index():
