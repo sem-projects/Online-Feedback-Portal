@@ -1,5 +1,6 @@
 from flask import Flask,render_template,redirect, url_for, request
 import sqlite3
+from functools import wraps
 from flask import Flask,render_template,redirect, url_for,request
 from flask_sqlite_admin.core import sqliteAdminBlueprint
 app = Flask(__name__, static_url_path='/static')
@@ -34,6 +35,15 @@ al = cur.fetchall()
 print (al)
 conn.close()
 
+def check_validity(func):
+	@wraps(func)
+	def decorated_function(*args, **kwargs):
+		if request.referrer != "http://127.0.0.1:5000/login" and request.referrer != "http://localhost:5000/login":
+			print ("dont be smart")
+			return redirect(url_for('login'))
+		return func(*args, **kwargs)
+
+	return decorated_function
 
 @app.route('/')
 def index():
@@ -116,15 +126,17 @@ def register():
 			return redirect(url_for('login'))
 	return render_template("student_register.html", message = message)
 
+
 @app.route('/dashboard/id')
-def dashboard(id):
+@check_validity
+def dashboard():
 	print ("dashboard")
-	return ("login")
+	return render_template("userdash.html")
 
 
 
 
 if __name__ == '__main__':
-	#app.debug = True
+	app.debug = True
 	app.run()
-	#app.run(debug = True)	
+	app.run(debug = True)	
