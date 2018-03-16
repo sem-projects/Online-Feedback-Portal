@@ -39,7 +39,7 @@
 
 body, html {
 
-
+   background-attachment: fixed;
 	height: 100%;
 	font-family: Poppins-Regular, sans-serif;
 }

@@ -1,0 +1,76 @@
+/* universal */
+h1 {
+	font-size: 32px;
+}
+h2 {
+	border-top: 1px solid #CBCBCB;
+	padding: 20px 0px 20px 0px;
+	margin: 40px 0px 20px 0px;
+	font-size: 16px;
+	color: #666;
+}
+.alert-secir {
+	margin-top:40px;
+}
+
+/* auth management page */
+.auth-edit {
+	float: right;
+}
+.auth-form-control {
+	width:100% !important;
+}
+.w90 {
+	width: 90%;
+}
+.w66 {
+	width: 66%;
+	margin-left:10px;
+}
+.w25 {
+	width: 25%;
+}
+.w70 {
+	width: 70%;
+}
+.w5 {
+	width: 5%;
+}
+.transparent {
+	background-color:inherit;
+}
+.load-gif {
+	vertical-align:text-top;
+	width:18px;
+	margin-left:7px;
+}
+.margin20 {
+	margin:20px;
+}
+.glyphicon-wrench {
+	float:right;
+}
+.margin4020 {
+	margin:40px 0px 20px 0px;
+}
+.table-popover {
+	padding:0px;
+	margin-bottom:0px;
+}
+
+.table-popover td {
+	border-top:none !important;
+}
+
+.popover-content {
+	padding:0px;
+}
+
+.popover-daddy .popover-title{
+	padding:0px 8px 6px;
+	background-color:inherit;
+	border:none;
+}
+.noMargin {
+	margin:0px;
+}

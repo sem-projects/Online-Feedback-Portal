@@ -1,0 +1,28 @@
+{% extends baseLayout %}
+{% block body %}
+<link rel=stylesheet type=text/css href="{{ url_for(bpName+'.static', filename='css/sqliteAdmin.css') }}">
+
+
+<div class="margin4020">
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    {% for tab in res %}
+    <li role="presentation">
+    	<a href="#{{tab}}" aria-controls="{{tab}}" role="tab" data-toggle="tab">{{tab}}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  
+  <!-- Tab panes -->
+  <div class="tab-content">
+  {% for tab in res %}
+    <!-- {{tab}} pane -->
+    <div class="tab-pane" id="{{tab}}"></div>
+  {% endfor %}
+  </div>
+
+</div>
+
+<script src="{{ url_for(bpName+'.static', filename='js/sqliteAdmin.js') }}"></script>	
+{% endblock %}
