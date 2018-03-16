@@ -30,7 +30,9 @@
 <body background = "/static/back4.jpg" style="background-repeat: no-repeat;
   background-position: center;
     	 width: 100%;background-size:100% 100%;">
-	
+    	 	{% if message is not none %}
+   			 <h2>{{message}}</h2>
+			{% endif %}
 	<div class="limiter" style="opacity:0.98;height:600px;padding:2.8%;">
 		<div class="container-login100" style="opacity:0.98;" >
 			<div class="wrap-login100">

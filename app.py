@@ -33,6 +33,9 @@ def index():
 
 @app.route('/login',methods = ['GET','POST'])
 def login():
+	message = None
+	if request.method == 'GET':
+		return render_template("login.html",message = None	)
 	if request.method == 'POST':
 		username=request.form.get('username','')
 		password=request.form.get('pass','')
@@ -42,12 +45,17 @@ def login():
 		#curr.execute("SELECT count(*) FROM users WHERE email = ?", (request.form.get('username',''),))
 		curr.execute("SELECT count(*) FROM users WHERE email = (?)",(username,))
 		data = curr.fetchone()[0]
-		if data==0:
-			print('There is no component named %s'%request.form.get('username'))
+		if data ==0:
+			print('There is no user%s'%request.form.get('username'))
+			message = "the user does not exists please register"
     	if data !=0:
         	print('Component %s found in %s row(s)'%(username,data))
+        	curr.execute("SELECT count(*) FROM users WHERE email = (?) and pass = (?)",(username,password,))
+        	check = curr.fetchone()[0]
+        	if check != 0:
+        		print ("success")
         conn.close()
-	return render_template("login.html")
+	return render_template("login.html",message = message)
       
 
 
