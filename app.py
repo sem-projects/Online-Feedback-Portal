@@ -1,8 +1,11 @@
 from flask import Flask,render_template,redirect, url_for, request
 import sqlite3
 from functools import wraps
-from flask import Flask,render_template,redirect, url_for,request
+from flask import Flask,render_template,redirect, url_for,request,session,flash
+import os
 from flask_sqlite_admin.core import sqliteAdminBlueprint
+
+
 app = Flask(__name__, static_url_path='/static')
 
 
@@ -10,7 +13,7 @@ conn = sqlite3.connect('database.db')
 print ("Opened database successfully")
 
 sqliteAdminBP = sqliteAdminBlueprint(dbPath = 'database.db')
-app.register_blueprint(sqliteAdminBP, url_prefix='/database')
+#app.register_blueprint(sqliteAdminBP, url_prefix='/admin')
 
 conn.execute('CREATE TABLE IF NOT EXISTS users ( email TEXT primary key,name TEXT, dob DATE, pass TEXT, type TEXT)')
 print ("USERS Table created successfully")
@@ -35,6 +38,17 @@ al = cur.fetchall()
 print (al)
 conn.close()
 
+
+@app.route('/adminlogin', methods=['POST'])
+def admin_login():
+    if request.form['password'] == 'password' and request.form['username'] == 'admin':
+        session['admin_logged_in'] = True
+        print "auth done.................................."
+        return redirect('http://127.0.0.1:5000/admin')				####change to host
+    else:
+        flash('wrong password!')
+
+
 def check_validity(func):
 	@wraps(func)
 	def decorated_function(*args, **kwargs):
@@ -44,6 +58,30 @@ def check_validity(func):
 		return func(*args, **kwargs)
 
 	return decorated_function
+
+def do_admin_login(func):
+	@wraps(func)
+	def decorated_function(*args, **kwargs):
+		if not session.get('admin_logged_in'):
+			print "decorater called..........................."
+			return render_template('adminlogin.html')
+		#session['admin_logged_in'] = False
+		return func(*args, **kwargs)
+
+	return decorated_function
+
+
+
+sqliteAdminBP = sqliteAdminBlueprint(
+  dbPath = 'database.db',
+  decorator = do_admin_login
+)	
+app.register_blueprint(sqliteAdminBP, url_prefix='/admin')
+
+
+
+
+   
 
 @app.route('/')
 def index():
@@ -59,6 +97,9 @@ def login():
 		password=request.form.get('pass',)
 		print (username)
 		print (password)
+		if password == 'password' and username == 'admin':
+			session['admin_logged_in'] = True
+			return redirect('http://127.0.0.1:5000/admin')						#### change to host url 
 		conn = sqlite3.connect('database.db')
 		print ("Opened database successfully")
 		curr = conn.cursor()
@@ -80,6 +121,21 @@ def login():
 				user=username.split("@")[0]
 				return redirect(url_for('dashboard',id=user))	
 		conn.close()
+    	if data !=0:
+        	print('Component %s found in %s row(s)'%(username,data))
+        	curr.execute("SELECT count(*) FROM users WHERE email = (?) and pass = (?)",(username,password,))
+        	print ("pass2")
+        	check = curr.fetchone()[0]
+        	print (check)
+        	if check != 0:
+        		message = "success"
+        		print ("success")
+        		user=username.split("@")[0]
+        		session['logged_in'] = True
+        		return redirect(url_for('dashboard',id=user))
+        	else:
+        		flash("incorrect password")	
+        conn.close()
 	return render_template("login.html",message = message)
       
 
@@ -127,16 +183,31 @@ def register():
 	return render_template("student_register.html", message = message)
 
 
+@app.route('/dashboard')
+def dashboard2():
+
+	return render_template("dashboard.html")
+
+
 @app.route('/dashboard/id')
 @check_validity
 def dashboard():
-	print ("dashboard")
-	return render_template("userdash.html")
+	if not session.get('logged_in'):
+		return render_template('index.html')
+	else:
+		print ("dashboard")
+		return render_template("userdash.html")
+
+@app.route('/profile')
+def profile():
+
+	return render_template("user.html")
 
 
 
 
 if __name__ == '__main__':
-	app.debug = True
+	#app.debug = True
+	app.secret_key = os.urandom(12)
 	app.run()
-	app.run(debug = True)	
+	#app.run(debug = True)	
