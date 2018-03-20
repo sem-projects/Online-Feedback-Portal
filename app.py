@@ -15,7 +15,7 @@ print ("Opened database successfully")
 sqliteAdminBP = sqliteAdminBlueprint(dbPath = 'database.db')
 #app.register_blueprint(sqliteAdminBP, url_prefix='/admin')
 
-conn.execute('CREATE TABLE IF NOT EXISTS users ( email TEXT primary key,name TEXT, dob DATE, pass TEXT, type TEXT)')
+conn.execute('CREATE TABLE IF NOT EXISTS users ( email TEXT primary key, username TEXT,name TEXT, dob DATE, pass TEXT, type TEXT)')
 print ("USERS Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS admin (email TEXT primary key, pass TEXT)')
@@ -174,8 +174,8 @@ def register():
 				user_type = "Student"
 			else:
 				user_type = "Faculty"
-			cur.execute("INSERT INTO USERS (email,name,dob,pass,type) values (?,?,?,?,?)",\
-				(email,nm,dob,password,user_type,))	
+			cur.execute("INSERT INTO USERS (email,username,name,dob,pass,type) values (?,?,?,?,?,?)",\
+				(email,email.split("@")[0],nm,dob,password,user_type,))	
 			print ("insert into user success")
 			conn.commit() 
 			conn.close()
@@ -183,31 +183,32 @@ def register():
 	return render_template("student_register.html", message = message)
 
 
-@app.route('/dashboard')
-def dashboard2():
-
-	return render_template("dashboard.html")
-
-
-@app.route('/dashboard/id')
-@check_validity
-def dashboard():
+@app.route('/dashboard/<id>')
+def dashboard(id):
 	if not session.get('logged_in'):
-		return render_template('index.html')
-	else:
-		print ("dashboard")
-		return render_template("userdash.html")
+		conn = sqlite3.connect('database.db')
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
+		users = cur.fetchall()
+		conn.close()
+		return render_template("dashboard.html",users=users)
 
-@app.route('/profile')
+
+@app.route('/profile/<id>')
 def profile():
-
-	return render_template("user.html")
+	if not session.get('logged_in'):
+		conn = sqlite3.connect('database.db')
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
+		users = cur.fetchall()
+		conn.close()
+		return render_template("user.html",users=users)
 
 
 
 
 if __name__ == '__main__':
-	#app.debug = True
+	app.debug = True
 	app.secret_key = os.urandom(12)
 	app.run()
-	#app.run(debug = True)	
+	app.run(debug = True)	
