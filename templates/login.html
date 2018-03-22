@@ -31,10 +31,7 @@
   background-position: center;
    background-attachment: fixed;
     	 width: 100%;background-size:100% 100%;">
-    	 	{% if message is not none %}
-   			 <h2>{{message}}</h2>
-			{% endif %}
-	<div class="limiter" style="opacity:0.98;height:600px;padding:2.8%;">
+    		<div class="limiter" style="opacity:0.98;height:600px;padding:2.8%;">
 		<div class="container-login100" style="opacity:0.98;" >
 			<div class="wrap-login100">
 				<form class="login100-form validate-form" method = "POST">
@@ -61,21 +58,28 @@
 						<label class="label-checkbox100" for="ckb1">
 							Remember me
 						</label>
+
 					</div>
 
 					<div class="container-login100-form-btn">
 						<button class="login100-form-btn">
 							Login
 						</button>
+
 					</div>
 
-					<div class="text-center p-t-90" style = "margin-top: -50px">
+					<div class="text-center p-t-90" style = "margin-top: -80px">
+						{% if message is not none %}
+							<a class="txt1">
+								{{message}}<br>
+							</a>
+						{% endif %}
 						<a class="txt1" href="{{url_for('register')}}">
 							SIGN UP<br>
 						</a>
-						<a class="txt1" href="#">
-							Forgot Password?
-						</a>
+							<a class="txt1" href="#">
+								Forgot Password?
+							</a>
 					</div>
 				</form>
 			</div>

@@ -24,13 +24,13 @@ print ("ADMIN Table created successfully")
 conn.execute('CREATE TABLE IF NOT EXISTS courses (code TEXT primary key, credits INT, department TEXT)')
 print ("COURSES Table created successfully")
 
-conn.execute('CREATE TABLE IF NOT EXISTS query_feedback (faculty_email TEXT,student_email TEXT, course_code TEXT,feedback TEXT, query TEXT,reply_to_query TEXT)')
+conn.execute('CREATE TABLE IF NOT EXISTS query_feedback (faculty_email TEXT primary key,student_email TEXT, course_code TEXT,feedback TEXT, query TEXT,reply_to_query TEXT)')
 print ("QUERY_FEEDBACK Table created successfully")
 
-conn.execute('CREATE TABLE IF NOT EXISTS questions (question TEXT)')
+conn.execute('CREATE TABLE IF NOT EXISTS questions (question_id TEXT primary key, question_type TEXT, question TEXT)')
 print ("QUESTIONS Table created successfully")
 
-conn.execute('CREATE TABLE IF NOT EXISTS rating (course_code TEXT, question TEXT, faculty_email TEXT,student_email TEXT,rating INT)')
+conn.execute('CREATE TABLE IF NOT EXISTS rating (r_id integer not null primary key AUTOINCREMENT,course_code TEXT, question_id TEXT, faculty_email TEXT,student_email TEXT,rating INT)')
 print ("RATING Table created successfully")
 cur = conn.cursor()
 cur.execute("SELECT * FROM users")
@@ -90,6 +90,8 @@ def index():
 @app.route('/login',methods = ['GET','POST'])
 def login():
 	message = None
+	if session.get('logged_in'):
+		return redirect(url_for(dashboard,session.get('username')))
 	if request.method == 'GET':
 		return render_template("login.html",message = None	)
 	if request.method == 'POST':
@@ -109,7 +111,7 @@ def login():
 		if data ==0:
 			print('There is no user%s'%request.form.get('username'))
 			message = "the user does not exists please register"
-		if data!=0:
+		if data !=0:
 			print('Component %s found in %s row(s)'%(username,data))
 			curr.execute("SELECT count(*) FROM users WHERE email = (?) and pass = (?)",(username,password,))
 			print ("pass2")
@@ -119,22 +121,12 @@ def login():
 				message = "success"
 				print ("success")
 				user=username.split("@")[0]
-				return redirect(url_for('dashboard',id=user))	
-		conn.close()
-    	if data !=0:
-        	print('Component %s found in %s row(s)'%(username,data))
-        	curr.execute("SELECT count(*) FROM users WHERE email = (?) and pass = (?)",(username,password,))
-        	print ("pass2")
-        	check = curr.fetchone()[0]
-        	print (check)
-        	if check != 0:
-        		message = "success"
-        		print ("success")
-        		user=username.split("@")[0]
-        		session['logged_in'] = True
-        		return redirect(url_for('dashboard',id=user))
-        	else:
-        		flash("incorrect password")	
+				session['logged_in'] = True
+				session['id'] = user
+				conn.close()
+				return redirect(url_for('dashboard',id=user))
+			else:
+				return render_template("login.html",message = "INCORRECT PASSWORD")	
         conn.close()
 	return render_template("login.html",message = message)
       
@@ -185,30 +177,35 @@ def register():
 
 @app.route('/dashboard/<id>')
 def dashboard(id):
-	if not session.get('logged_in'):
+	if session.get('logged_in'): #and session.get('username') == id:
 		conn = sqlite3.connect('database.db')
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
 		users = cur.fetchall()
 		conn.close()
 		return render_template("dashboard.html",users=users)
+	else:
+		return redirect(url_for(login))
+
 
 
 @app.route('/profile/<id>')
-def profile():
-	if not session.get('logged_in'):
+def profile(id):
+	if session.get('logged_in') and session.get('username') == id:
 		conn = sqlite3.connect('database.db')
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
 		users = cur.fetchall()
 		conn.close()
 		return render_template("user.html",users=users)
+	else:
+		return redirect(url_for(login))
 
 
 
 
 if __name__ == '__main__':
-	app.debug = True
+	#app.debug = True
 	app.secret_key = os.urandom(12)
 	app.run()
-	app.run(debug = True)	
+	#app.run(debug = True)	
