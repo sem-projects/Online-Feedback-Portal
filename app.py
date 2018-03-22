@@ -204,11 +204,87 @@ def profile(id):
 	return redirect(url_for('login'))
 
 
+@app.route('/query')
+def query():
+	global current
+	if session.get('logged_in'):
+		conn = sqlite3.connect('database.db')
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+		users = cur.fetchone()
+		conn.close()
+		return render_template("query.html",users=users)
+
+	return redirect(url_for('login'))
+
+
+@app.route('/feedback')
+def feedback():
+	global current
+	if session.get('logged_in'):
+		conn = sqlite3.connect('database.db')
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+		users = cur.fetchone()
+		conn.close()
+		return redirect(url_for('question',qu=1,users=users))
+
+	return redirect(url_for('login'))
+
+
+@app.route('/question/<id>')
+def question(id):
+	global current
+	if session.get('logged_in'):
+		conn = sqlite3.connect('database.db')
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+		users = cur.fetchone()
+		conn.close()
+		return render_template("questions.html",qu=id,users=users)
+
+	return redirect(url_for('login'))
+
+
+@app.route('/change_password')
+def change_password():
+	global current
+	if session.get('logged_in'):
+		conn = sqlite3.connect('database.db')
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+		users = cur.fetchone()
+		conn.close()
+		return render_template("changepwd.html",users=users)
+
+	return redirect(url_for('login'))
+
+
+@app.route('/notifications')
+def notifications():
+	global current
+	if session.get('logged_in'):
+		conn = sqlite3.connect('database.db')
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+		users = cur.fetchone()
+		conn.close()
+		return render_template("notifications.html",users=users)
+
+	return redirect(url_for('login'))
+
+
+@app.route('/logout')
+def logout():
+	if session.get('logged_in'):
+		session['logged_in']=False
+
+	return redirect(url_for('login'))
 
 
 
 if __name__ == '__main__':
-	#app.debug = True
+	app.debug = True
 	app.secret_key = os.urandom(12)
 	app.run()
-	#app.run(debug = True)	
+	app.run(debug = True)	
