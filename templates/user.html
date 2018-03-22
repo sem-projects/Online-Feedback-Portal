@@ -96,13 +96,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group label-floating">
-                                                    <label class="control-label">Fist Name</label>
-                                                    <input type="text" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group label-floating">
-                                                    <label class="control-label">Last Name</label>
+                                                    <label class="control-label">Name</label>
                                                     <input type="text" class="form-control">
                                                 </div>
                                             </div>
@@ -149,10 +143,14 @@
                                     </a>
                                 </div>
                                 <div class="content">
-                                    <h6 class="category text-gray">CEO / Co-Founder</h6>
-                                    <h4 class="card-title">Alec Thompson</h4>
-                                    <p class="card-content">
-                                        Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...
+                                    <h6 class="category text-gray">{{users[1].upper()}}</h6>
+                                    <h4 class="card-title">{{users[2].upper()}}</h4>
+                                    <p style = "text-align: left; padding-left: 40px">
+                                        <strong>    E-mail    : </strong> {{users[0].upper()}} <br>
+                                        <strong>    DOB       : </strong> {{users[3].upper()}} <br>
+                                        <strong>    USER TYPE : </strong> {{users[5].upper()}} <br>
+                                        
+                                        
                                     </p>
                                 </div>
                             </div>

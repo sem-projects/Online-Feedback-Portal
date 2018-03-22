@@ -42,7 +42,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="./user.html">
+                        <a href="{{ url_for('profile',id=users[1])}}">
                             <i class="material-icons">person</i>
                             <p>User Profile</p>
                         </a>
@@ -90,7 +90,7 @@
                                     <i class="material-icons">content_copy</i>
                                 </div>
                                 <div class="card-content">
-                                    <p class="category">Used Space</p>
+                                    <p class="category">{{users[1]}}</p>
                                     <h3 class="title">49/50
                                         <small>GB</small>
                                     </h3>

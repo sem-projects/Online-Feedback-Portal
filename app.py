@@ -80,7 +80,7 @@ app.register_blueprint(sqliteAdminBP, url_prefix='/admin')
 
 
 
-
+current = None
    
 
 @app.route('/')
@@ -90,8 +90,9 @@ def index():
 @app.route('/login',methods = ['GET','POST'])
 def login():
 	message = None
+	global current
 	if session.get('logged_in'):
-		return redirect(url_for(dashboard,session.get('username')))
+		return redirect(url_for('dashboard',id = current))
 	if request.method == 'GET':
 		return render_template("login.html",message = None	)
 	if request.method == 'POST':
@@ -122,7 +123,7 @@ def login():
 				print ("success")
 				user=username.split("@")[0]
 				session['logged_in'] = True
-				session['id'] = user
+				current = user
 				conn.close()
 				return redirect(url_for('dashboard',id=user))
 			else:
@@ -177,29 +178,31 @@ def register():
 
 @app.route('/dashboard/<id>')
 def dashboard(id):
-	if session.get('logged_in'): #and session.get('username') == id:
+	global current
+	if session.get('logged_in') and id == current:
 		conn = sqlite3.connect('database.db')
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
-		users = cur.fetchall()
+		users = cur.fetchone()
+		print users
 		conn.close()
 		return render_template("dashboard.html",users=users)
-	else:
-		return redirect(url_for(login))
+	return redirect(url_for('login'))
 
 
 
 @app.route('/profile/<id>')
 def profile(id):
-	if session.get('logged_in') and session.get('username') == id:
+	global current
+	if session.get('logged_in') and id == current:
 		conn = sqlite3.connect('database.db')
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
-		users = cur.fetchall()
+		users = cur.fetchone()
 		conn.close()
 		return render_template("user.html",users=users)
-	else:
-		return redirect(url_for(login))
+	return redirect(url_for('login'))
+
 
 
 
