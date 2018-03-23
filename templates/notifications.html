@@ -29,13 +29,13 @@
         Tip 2: you can also add an image using data-image tag
     -->
             <div class="logo">
-                <a href="http://www.creative-tim.com" class="simple-text">
+                <a >
                     STUDENT AREA
                 </a>
             </div>
             <div class="sidebar-wrapper">
                 <ul class="nav">
-                     <li class="active">
+                     <li>
                         <a href="{{url_for('dashboard',id=users[1])}}">
                             <i class="material-icons">dashboard</i>
                             <p>Dashboard</p>
@@ -65,7 +65,7 @@
                             <p>Change Password</p>
                         </a>
                     </li>
-            <li>
+            <li class="active">
                         <a href="{{url_for('notifications')}}">
                             <i class="material-icons">sms</i>
                             <p>Notifications</p>
@@ -215,7 +215,7 @@
                         <script>
                             document.write(new Date().getFullYear())
                         </script>
-                        <a href="http://www.creative-tim.com">Creative Tim</a>, made with love for a better web
+                        
                     </p>
                 </div>
             </footer>

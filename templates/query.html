@@ -35,7 +35,7 @@
             </div>
             <div class="sidebar-wrapper">
                 <ul class="nav">
-                     <li class="active">
+                     <li>
                         <a href="{{url_for('dashboard',id=users[1])}}">
                             <i class="material-icons">dashboard</i>
                             <p>Dashboard</p>
@@ -47,7 +47,7 @@
                             <p>User Profile</p>
                         </a>
                     </li>
-                    <li>
+                    <li class="active">
                         <a href="{{url_for('query')}}">
                             <i class="material-icons">content_paste</i>
                             <p>Query</p>
@@ -117,7 +117,7 @@
                         <script>
                             document.write(new Date().getFullYear())
                         </script>
-                        <a href="http://www.creative-tim.com">Creative Tim</a>, made with love for a better web
+                        
                     </p>
                 </div>
             </footer>
