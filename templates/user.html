@@ -35,44 +35,44 @@
             </div>
             <div class="sidebar-wrapper">
                 <ul class="nav">
-                    <li >
-                        <a href="dashboard.html">
+                     <li class="active">
+                        <a href="{{url_for('dashboard',id=users[1])}}">
                             <i class="material-icons">dashboard</i>
                             <p>Dashboard</p>
                         </a>
                     </li>
-                    <li class="active">
-                        <a href="./user.html">
+                    <li>
+                        <a href="{{url_for('profile',id=users[1])}}">
                             <i class="material-icons">person</i>
                             <p>User Profile</p>
                         </a>
                     </li>
                     <li>
-                        <a href="./table.html">
+                        <a href="{{url_for('query')}}">
                             <i class="material-icons">content_paste</i>
                             <p>Query</p>
                         </a>
                     </li>
                     <li>
-                        <a href="./typography.html">
+                        <a href="{{url_for('feedback')}}">
                             <i class="material-icons">library_books</i>
                             <p>Feedback</p>
                         </a>
                     </li>
 		    <li>
-                        <a href="./user.html">
+                        <a href="{{url_for('change_password')}}">
                             <i class="fa fa-key"></i>
                             <p>Change Password</p>
                         </a>
                     </li>
 		    <li>
-                        <a href="./table.html">
+                        <a href="{{url_for('notifications')}}">
                             <i class="material-icons">sms</i>
                             <p>Notifications</p>
                         </a>
                     </li>
                     <li>
-                        <a href="./table.html">
+                        <a href="{{url_for('logout')}}">
                             <i class="fa fa-user"></i>
                             <p>Log Out</p>
                         </a>
