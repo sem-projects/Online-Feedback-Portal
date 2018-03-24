@@ -1,4 +1,4 @@
-	from flask import Flask,render_template,redirect, url_for, request
+from flask import Flask,render_template,redirect, url_for, request
 import sqlite3
 from functools import wraps
 from flask import Flask,render_template,redirect, url_for,request,session,flash
@@ -18,10 +18,13 @@ sqliteAdminBP = sqliteAdminBlueprint(dbPath = 'database.db')
 conn.execute('CREATE TABLE IF NOT EXISTS users ( email TEXT primary key, username TEXT,name TEXT, dob DATE, pass TEXT, type TEXT)')
 print ("USERS Table created successfully")
 
+conn.execute('CREATE TABLE IF NOT EXISTS users_courses (S_no integer not null primary key AUTOINCREMENT,username TEXT,course_code TEXT)')
+print ("USERS_courses Table created successfully")
+
 conn.execute('CREATE TABLE IF NOT EXISTS admin (email TEXT primary key, pass TEXT)')
 print ("ADMIN Table created successfully")
 
-conn.execute('CREATE TABLE IF NOT EXISTS courses (code TEXT primary key, credits INT, department TEXT)')
+conn.execute('CREATE TABLE IF NOT EXISTS courses (S_no integer not null primary key AUTOINCREMENT,course_code TEXT,couse_name TEXT, credits INT, department TEXT)')
 print ("COURSES Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS query_feedback (faculty_email TEXT primary key,student_email TEXT, course_code TEXT,feedback TEXT, query TEXT,reply_to_query TEXT)')
@@ -184,9 +187,12 @@ def dashboard(id):
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
 		users = cur.fetchone()
+		cur.execute("SELECT courses.course_code,couse_name,credits,department FROM users_courses,courses WHERE username = (?) and users_courses.course_code = courses.course_code",(id,))
+		courses = cur.fetchall()
 		print users
+		print courses
 		conn.close()
-		return render_template("dashboard.html",users=users)
+		return render_template("dashboard.html",users=users ,courses = courses)
 	return redirect(url_for('login'))
 
 

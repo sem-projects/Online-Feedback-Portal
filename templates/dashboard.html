@@ -86,48 +86,26 @@
                         <div class="col-md-9">
                             <div class="card">
                                 <div class="card-header" data-background-color="purple">
-                                    <h4 class="title">Course Details</h4>
+                                    <h4 class="title">Course Details</h4>   
                                 </div>
                                 <div class="card-content table-responsive">
                                     <table class="table">
-                                        <thead class="text-primary">
-                                            <th>S.No.</th>
-                                            <th>Course</th>
-                                            <th>Faculty Name</th>
-                                        </thead>
-                                        <tbody>
+                                          <tr>
+                                            <th>COURSE_CODE</th>
+                                            <th>COURSE_Name</th>
+                                            <th>Credits</th>
+                                            <th>Department</th>
+
+                                          </tr>                                      
+                                        {% for item in courses %}
                                             <tr>
-                                                <td>Dakota Rice</td>
-                                                <td>Niger</td>
-                                                <td>Oud-Turnhout</td>
+                                                <td>{{item[0]}}</td>
+                                                <td>{{item[1]}}</td>
+                                                <td>{{item[2]}}</td>
+                                                <td>{{item[3]}}</td>
                                             </tr>
-                                            <tr>
-                                                <td>Minerva Hooper</td>
-                                                <td>Curaçao</td>
-                                                <td>Sinaai-Waas</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Sage Rodriguez</td>
-                                                <td>Netherlands</td>
-                                                <td>Baileux</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Philip Chaney</td>
-                                                <td>Korea, South</td>
-                                                <td>Overland Park</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Doris Greene</td>
-                                                <td>Malawi</td>
-                                                <td>Feldkirchen in Kärnten</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Mason Porter</td>
-                                                <td>Chile</td>
-                                                <td>Gloucester</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                        {% endfor %}
+                                    </table>                                       
                                 </div>
                             </div>
                         </div>
