@@ -27,8 +27,8 @@ print ("ADMIN Table created successfully")
 conn.execute('CREATE TABLE IF NOT EXISTS courses (S_no integer not null primary key AUTOINCREMENT,course_code TEXT,couse_name TEXT, credits INT, department TEXT)')
 print ("COURSES Table created successfully")
 
-conn.execute('CREATE TABLE IF NOT EXISTS query_feedback (faculty_email TEXT primary key,student_email TEXT, course_code TEXT,feedback TEXT, query TEXT,reply_to_query TEXT)')
-print ("QUERY_FEEDBACK Table created successfully")
+conn.execute('CREATE TABLE IF NOT EXISTS query (S_no integer not null primary key AUTOINCREMENT,username TEXT,query TEXT,reply_to_query TEXT,seen integer,)')
+print ("QUERY Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS questions (question_id TEXT primary key, question_type TEXT, question TEXT)')
 print ("QUESTIONS Table created successfully")
@@ -37,6 +37,9 @@ conn.execute('CREATE TABLE IF NOT EXISTS rating (r_id integer not null primary k
 print ("RATING Table created successfully")
 cur = conn.cursor()
 cur.execute("SELECT * FROM users")
+al = cur.fetchall()
+print (al)
+cur.execute("SELECT * FROM query")
 al = cur.fetchall()
 print (al)
 conn.close()
@@ -189,6 +192,7 @@ def dashboard(id):
 		users = cur.fetchone()
 		cur.execute("SELECT courses.course_code,couse_name,credits,department FROM users_courses,courses WHERE username = (?) and users_courses.course_code = courses.course_code",(id,))
 		courses = cur.fetchall()
+		#cur.execute("SELECT * FROM query where username = (?) and reply_to_query = (?)",(id,));
 		print users
 		print courses
 		conn.close()
@@ -210,16 +214,31 @@ def profile(id):
 	return redirect(url_for('login'))
 
 
-@app.route('/query')
+@app.route('/query',methods = ['GET','POST'])
 def query():
 	global current
 	if session.get('logged_in'):
-		conn = sqlite3.connect('database.db')
-		cur = conn.cursor()
-		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
-		users = cur.fetchone()
-		conn.close()
-		return render_template("query.html",users=users)
+		if request.method == 'GET':
+			conn = sqlite3.connect('database.db')
+			cur = conn.cursor()
+			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+			users = cur.fetchone()
+			conn.close()
+			return render_template("query.html",users=users,message = None)
+		if request.method == 'POST':
+			conn = sqlite3.connect('database.db')
+			cur = conn.cursor()
+			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+			users = cur.fetchone()
+			print "query post"
+			qu = request.form.get('query',)
+			print qu
+			cur.execute("INSERT INTO query (username,query,reply_to_query) values (?,?,?)",\
+				(current,qu,None,))
+			conn.commit()
+			print "query updated"
+			conn.close()
+			return render_template("query.html",users=users,message = "Query updated successfully")
 
 	return redirect(url_for('login'))
 
@@ -241,6 +260,7 @@ def feedback():
 @app.route('/question/<id>')
 def question(id):
 	global current
+
 	if session.get('logged_in'):
 		conn = sqlite3.connect('database.db')
 		cur = conn.cursor()
