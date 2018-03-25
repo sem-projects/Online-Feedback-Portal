@@ -27,7 +27,7 @@ print ("ADMIN Table created successfully")
 conn.execute('CREATE TABLE IF NOT EXISTS courses (S_no integer not null primary key AUTOINCREMENT,course_code TEXT,couse_name TEXT, credits INT, department TEXT)')
 print ("COURSES Table created successfully")
 
-conn.execute('CREATE TABLE IF NOT EXISTS query (S_no integer not null primary key AUTOINCREMENT,username TEXT,query TEXT,reply_to_query TEXT,seen integer,)')
+conn.execute('CREATE TABLE IF NOT EXISTS query (S_no integer not null primary key AUTOINCREMENT,username TEXT,query TEXT,reply_to_query TEXT,seen integer)')
 print ("QUERY Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS questions (question_id TEXT primary key, question_type TEXT, question TEXT)')
@@ -195,8 +195,13 @@ def dashboard(id):
 		#cur.execute("SELECT * FROM query where username = (?) and reply_to_query = (?)",(id,));
 		print users
 		print courses
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+		notifications = cur.fetchall()
+		if notifications==[]:
+			notifications=None
 		conn.close()
-		return render_template("dashboard.html",users=users ,courses = courses)
+		return render_template("dashboard.html",users=users,notifications=notifications,courses = courses)
 	return redirect(url_for('login'))
 
 
@@ -209,8 +214,12 @@ def profile(id):
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
 		users = cur.fetchone()
+		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+		notifications = cur.fetchall()
+		if notifications==[]:
+			notifications=None
 		conn.close()
-		return render_template("user.html",users=users)
+		return render_template("user.html",users=users,notifications=notifications)
 	return redirect(url_for('login'))
 
 
@@ -233,8 +242,8 @@ def query():
 			print "query post"
 			qu = request.form.get('query',)
 			print qu
-			cur.execute("INSERT INTO query (username,query,reply_to_query) values (?,?,?)",\
-				(current,qu,None,))
+			cur.execute("INSERT INTO query (username,query,reply_to_query,seen) values (?,?,?,?)",\
+				(current,qu,None,0,))
 			conn.commit()
 			print "query updated"
 			conn.close()
@@ -251,8 +260,12 @@ def feedback():
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
+		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+		notifications = cur.fetchall()
+		if notifications==[]:
+			notifications=None
 		conn.close()
-		return redirect(url_for('question',qu=1,users=users))
+		return redirect(url_for('question',qu=1,users=users,notifications=notifications))
 
 	return redirect(url_for('login'))
 
@@ -266,8 +279,12 @@ def question(id):
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
+		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+		notifications = cur.fetchall()
+		if notifications==[]:
+			notifications=None
 		conn.close()
-		return render_template("questions.html",qu=id,users=users)
+		return render_template("questions.html",qu=id,users=users,notifications=notifications)
 
 	return redirect(url_for('login'))
 
@@ -280,8 +297,12 @@ def change_password():
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
+		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+		notifications = cur.fetchall()
+		if notifications==[]:
+			notifications=None
 		conn.close()
-		return render_template("changepwd.html",users=users)
+		return render_template("changepwd.html",users=users,notifications=notifications)
 
 	return redirect(url_for('login'))
 
@@ -294,6 +315,8 @@ def notifications():
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
+		cur.execute("UPDATE query SET seen = (?) WHERE username = (?) and seen = (?)",(1,current,0,))
+		conn.commit()
 		conn.close()
 		return render_template("notifications.html",users=users)
 

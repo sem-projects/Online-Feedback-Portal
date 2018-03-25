@@ -68,7 +68,7 @@
             <li>
                         <a href="{{url_for('notifications')}}">
                             <i class="material-icons">sms</i>
-                            <p>Notifications</p>
+                            {% if notifications is none %}<p>Notifications</p>{% else %}<p style="color:red;">Notifications</p>{% endif %}
                         </a>
                     </li>
                     <li>
