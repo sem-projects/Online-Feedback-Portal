@@ -27,7 +27,7 @@ print ("ADMIN Table created successfully")
 conn.execute('CREATE TABLE IF NOT EXISTS courses (S_no integer not null primary key AUTOINCREMENT,course_code TEXT,couse_name TEXT, credits INT, department TEXT)')
 print ("COURSES Table created successfully")
 
-conn.execute('CREATE TABLE IF NOT EXISTS query (S_no integer not null primary key AUTOINCREMENT,username TEXT,query TEXT,reply_to_query TEXT,seen integer,)')
+conn.execute('CREATE TABLE IF NOT EXISTS query (S_no integer not null primary key AUTOINCREMENT,username TEXT,query TEXT,reply_to_query TEXT,seen integer)')
 print ("QUERY Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS questions (question_id TEXT primary key, question_type TEXT, question TEXT)')
