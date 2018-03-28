@@ -252,21 +252,24 @@ def query():
 	return redirect(url_for('login'))
 
 
-@app.route('/feedback')
-def feedback():
+@app.route('/feedback/pid', methods = ['GET','POST'])
+def feedback(pid=None):
 	global current
 	if session.get('logged_in'):
 		conn = sqlite3.connect('database.db')
 		cur = conn.cursor()
-		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
-		users = cur.fetchone()
-		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+		cur.execute("SELECT * FROM questions")
+		questions = cur.fetchall()
+		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(current,0,))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
+		
+		if pid == None:
+			cur.execute("SELECT * FROM users WHERE type = (?)",('Faculty',))	
+			teachers = cur
+			return render_template("feedback.html",questions = None,users = current,teachers = teachers)
 		conn.close()
-		return redirect(url_for('question',qu=1,users=users,notifications=notifications))
-
 	return redirect(url_for('login'))
 
 

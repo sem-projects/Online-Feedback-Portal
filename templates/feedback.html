@@ -36,7 +36,7 @@
             <div class="sidebar-wrapper">
                 <ul class="nav">
                      <li>
-                        <a href="{{url_for('dashboard',id=users[1])}}">
+                        <a href="{{url_for('dashboard',id=users)}}">
                             <i class="material-icons">dashboard</i>
                             <p>Dashboard</p>
                         </a>
@@ -96,12 +96,12 @@
 						<div class="col-md-4">
 						
 						 <div class="dropdown" >
-						  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Dropdown Example
+						  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select Whome to give Feedback
 						  <span class="caret"></span></button>
 						  <ul class="dropdown-menu">
-						    <li><a href="#">HTML</a></li>
-						    <li><a href="#">CSS</a></li>
-						    <li><a href="#">JavaScript</a></li>
+                            {% for item in teachers %}
+                                            <li><a href=url_for('feedback',pid = item[1])>{{item[2]}}</a></li>
+                            {% endfor %}
 						  </ul>
 						</div> 
 						</div>
