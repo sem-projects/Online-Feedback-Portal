@@ -130,8 +130,13 @@ def login():
 				user=username.split("@")[0]
 				session['logged_in'] = True
 				current = user
+				curr.execute("SELECT type FROM users WHERE email = (?)",(username,))
+				user_type=curr.fetchone()[0]
 				conn.close()
-				return redirect(url_for('dashboard',id=user))
+				if user_type == "Student" :
+					return redirect(url_for('dashboard',id=user))
+				elif user_type == "Faculty" :
+					return redirect(url_for('facultydashboard',id=user))
 			else:
 				return render_template("login.html",message = "INCORRECT PASSWORD")	
         conn.close()
@@ -204,23 +209,69 @@ def dashboard(id):
 		return render_template("dashboard.html",users=users,notifications=notifications,courses = courses)
 	return redirect(url_for('login'))
 
-
-
-@app.route('/profile/<id>')
-def profile(id):
+@app.route('/facultydashboard/<id>')
+def facultydashboard(id):
 	global current
+
 	if session.get('logged_in') and id == current:
 		conn = sqlite3.connect('database.db')
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
 		users = cur.fetchone()
+		cur.execute("SELECT courses.course_code,couse_name,credits,department FROM users_courses,courses WHERE username = (?) and users_courses.course_code = courses.course_code",(id,))
+		courses = cur.fetchall()
+		#cur.execute("SELECT * FROM query where username = (?) and reply_to_query = (?)",(id,));
+		print users
+		print courses
+		cur = conn.cursor()
 		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
 		conn.close()
-		return render_template("user.html",users=users,notifications=notifications)
+		return render_template("facultydashboard.html",users=users,notifications=notifications,courses = courses)
 	return redirect(url_for('login'))
+
+
+@app.route('/profile/<id>',methods = ['GET','POST'])
+def profile(id):
+	global current
+	message=None
+	if session.get('logged_in') :
+		if request.method == 'GET':
+			conn = sqlite3.connect('database.db')
+			cur = conn.cursor()
+			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+			users = cur.fetchone()
+			cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+			notifications = cur.fetchall()
+			if notifications==[]:
+				notifications=None
+			conn.close()
+			return render_template("user.html",users=users,notifications=notifications,message=message)
+	
+		if request.method == 'POST':
+			conn = sqlite3.connect('database.db')
+			cur = conn.cursor()
+			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+			users = cur.fetchone()
+			cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+			notifications = cur.fetchall()
+			if notifications==[]:
+				notifications=None
+			nm = request.form.get('name',)
+			email=request.form.get('mail',)
+			dob = str(request.form.get('dob',))
+			sem = request.form.get('sem',)
+			mob = request.form.get('mob',)
+			message = "profile editied successfully"
+			cur.execute("UPDATE users SET name = (?) , dob = (?) WHERE username = (?)",(nm,dob,current,))
+			conn.commit()
+			conn.close()
+			return render_template("user.html",users=users,notifications=notifications,message=message)
+	
+	return redirect(url_for('login'))
+
 
 
 @app.route('/query',methods = ['GET','POST'])
@@ -292,20 +343,50 @@ def question(id):
 	return redirect(url_for('login'))
 
 
-@app.route('/change_password')
-def change_password():
+@app.route('/change_password/<id>',methods = ['GET','POST'])
+def change_password(id):
 	global current
+	message = None
 	if session.get('logged_in'):
-		conn = sqlite3.connect('database.db')
-		cur = conn.cursor()
-		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
-		users = cur.fetchone()
-		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
-		notifications = cur.fetchall()
-		if notifications==[]:
-			notifications=None
-		conn.close()
-		return render_template("changepwd.html",users=users,notifications=notifications)
+		if request.method == 'GET':
+			conn = sqlite3.connect('database.db')
+			cur = conn.cursor()
+			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+			users = cur.fetchone()
+			cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+			notifications = cur.fetchall()
+			if notifications==[]:
+				notifications=None
+			conn.close()
+			return render_template("changepwd.html",users=users,notifications=notifications,message=message)
+		if request.method=="POST":
+			conn = sqlite3.connect('database.db')
+			cur = conn.cursor()
+			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+			users = cur.fetchone()
+			cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+			notifications = cur.fetchall()
+			if notifications==[]:
+				notifications=None
+			cur.execute("SELECT pass FROM users WHERE username = (?)",(current,))
+			currpass = cur.fetchone()
+			old1 = request.form.get("old1",)
+			new1 = request.form.get("new1",)
+			new2 = request.form.get("new2",)
+			print old1,currpass[0]
+			if old1 != currpass[0]:
+				message = "Wrong password"
+				return render_template("changepwd.html",users=users,notifications=notifications,message=message)
+			elif new1!=new2:
+				message = "password doesn't match"
+				return render_template("changepwd.html",users=users,notifications=notifications,message=message)
+			else:
+				message = "password changed successfully"
+				cur.execute("UPDATE users set pass = (?) where username = (?)",(new1,current,))
+				conn.commit()
+				conn.close()
+				return render_template("changepwd.html",users=users,notifications=notifications,message=message)
+			
 
 	return redirect(url_for('login'))
 

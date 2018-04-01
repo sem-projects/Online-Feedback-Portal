@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="utf-8" />
-    <link rel="apple-touch-icon" sizes="76x76" href="../static/img/apple-icon.png" />
-    <link rel="icon" type="image/png" href="../static/img/favicon.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="../static/img/feedback.png" />
+    <link rel="icon" type="image/png" href="../static/img/feedback.png" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>User Profile</title>
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
@@ -60,7 +60,7 @@
                         </a>
                     </li>
 		    <li>
-                        <a href="{{url_for('change_password')}}">
+                        <a href="{{url_for('change_password',id=users[1])}}">
                             <i class="fa fa-key"></i>
                             <p>Change Password</p>
                         </a>
@@ -92,12 +92,12 @@
                                     <p class="category">Complete your profile</p>
                                 </div>
                                 <div class="card-content">
-                                    <form>
+                                    <form  method="POST">
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Name</label>
-                                                    <input type="text" class="form-control">
+                                                    <input name="name" type="text" class="form-control" value="{{users[2].upper()}}">
                                                 </div>
                                             </div>
                                         </div>
@@ -105,7 +105,7 @@
                                             <div class="col-md-14">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Email address</label>
-                                                    <input type="email" class="form-control">
+                                                    <input name="mail" type="email" class="form-control" value="{{users[0]}}" readonly>
                                                 </div>
                                             </div>
                                         </div>
@@ -113,25 +113,26 @@
                                             <div class="col-md-4">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Date Of Birth(yyyy/mm/dd)</label>
-                                                    <input type="text" class="form-control">
+                                                    <input name="dob" type="text" class="form-control" value="{{users[3].upper()}}">
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Semester</label>
-                                                    <input type="text" class="form-control">
+                                                    <input name="sem" type="text" class="form-control">
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Mobile No.</label>
-                                                    <input type="text" class="form-control">
+                                                    <input name="mob" type="text" class="form-control">
                                                 </div>
                                             </div>
                                         </div>
                                         <button type="submit" class="btn btn-primary pull-right">Update Profile</button>
                                         <div class="clearfix"></div>
                                     </form>
+                                    {% if message is not none %} <h1>{{message}}</h1>{% endif %}
                                 </div>
                             </div>
                         </div>
@@ -146,7 +147,7 @@
                                     <h6 class="category text-gray">{{users[1].upper()}}</h6>
                                     <h4 class="card-title">{{users[2].upper()}}</h4>
                                     <p style = "text-align: left; padding-left: 40px">
-                                        <strong>    E-mail    : </strong> {{users[0].upper()}} <br>
+                                        <strong>    E-mail    : </strong> {{users[0]}} <br>
                                         <strong>    DOB       : </strong> {{users[3].upper()}} <br>
                                         <strong>    USER TYPE : </strong> {{users[5].upper()}} <br>
                                         
