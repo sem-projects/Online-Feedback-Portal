@@ -1,0 +1,130 @@
+<div class="input-group margin4020"></div>
+{% if error %}
+<div class="alert alert-warning" role="alert">{{error}}</div>
+{% else %}
+<table class="table tablesorter table-hover">
+  <thead class="header">
+	<tr>
+	{% for c in data['schema'] %}
+	  {# if c['name'] != 'id' #}
+	  <th>
+	    <span><a data-q="{{qJson}}" class="th-sort">{{c['name']}}</a></span>
+	    {% if q['sort'] == c['name'] %}
+	      {% if q['dir'] == 'asc' %}
+	      <span class="glyphicon glyphicon glyphicon-sort-by-attributes"><span>
+	      {% else %}
+	      <span class="glyphicon glyphicon glyphicon-sort-by-attributes-alt"><span>
+	      {% endif %}
+	    {% endif %}
+	  </th>
+	  {# endif #}
+	{% endfor %}
+	  <th></th>
+	  <th></th>
+	</tr>
+  </thead>
+  <tbody class="searchable">
+	
+  {% if data['contents']|length > 0 %}			  			
+	{% for row in data['contents'] %}
+	<tr id="tr-{{q['table']}}-{{row[data['primaryKey']]}}">
+	  {% for c in data['schema'] %}
+	  {% if c['name'] == [data['primaryKey']] %}
+	  <td>
+		<span class="state-rest">{{ row[c['name']] }}</span>
+	  </td>	  
+	  {% else %}
+	  <td>
+		<input class="form-control state-edit" name="{{ c['name'] }}" value="{{ row[c['name']] }}"></input>
+		<span class="state-rest">{{ row[c['name']] }}</span>
+	  </td>
+	  {% endif %}
+	  {% endfor %}
+	  <td class="w5">
+		<button class="btn btn-primary state-edit edit-save" data-method="put" data-table="{{q['table']}}" data-id="{{row[data['primaryKey']]}}" data-primarykey="{{data['primaryKey']}}" data-toggle="tooltip" data-placement="top" title="Save edits">Save</button>
+	  </td>
+	  <td class="w5 text-muted wrench" data-placement="left" data-state="inactive" data-toggle="popover" data-content='
+		  <table class="table table-condensed table-hover table-popover">
+			<tr><td><span class="open-edit" data-table="{{q['table']}}" data-id="{{row[data['primaryKey']]}}"><span class="text-primary glyphicon glyphicon-pencil"></span> Edit</span></td></tr>
+			<tr><td><span class="state-edit edit-save" data-method="delete" data-table="{{q['table']}}" data-id="{{row[data['primaryKey']]}}" data-primarykey="{{data['primaryKey']}}"><span class="text-danger glyphicon glyphicon-trash"></span> Delete</span></td></tr>
+		  </table>
+	  ' data-html="true">
+		<span class="glyphicon glyphicon-wrench"></span>
+	  </td>
+	  <td class="w5 x-wrench">
+		<button type="button" class="close close-edit" data-table="{{q['table']}}" data-id="{{row[data['primaryKey']]}}">
+		  <span aria-hidden="true">&times;</span>
+		</button>
+	  </td>
+
+	</tr>
+	{% endfor %}
+  {% endif %}
+  
+
+	<tr class="add-detail noTableFilter" id="tr-{{q['table']}}-0">
+	{% for c in data['schema'] %}
+	  {% if c['name'] == data['primaryKey'] %}
+	  <td></td>	  
+	  {% else %}
+	  <td>
+		<input class="form-control state-add" name="{{c['name']}}"></input>
+	  </td>
+	  {% endif %}
+	{% endfor %}
+	  <td class="w5">
+		<button class="btn btn-default edit-save" data-method="post" data-table="{{q['table']}}" data-primarykey="{{data['primaryKey']}}" data-toggle="tooltip" data-placement="top" title="Save edits">Save</button>
+	  </td>
+	  <td>
+		<button type="button" class="close add-btn-close">
+		  <span aria-hidden="true">&times;</span>
+		</button>
+	  </td>
+	</tr>
+	<tr class="add-btn">
+		<td colspan="{{data['contents'][0]|length + 3}}"><button class="btn btn-default">Add Row</button></td>
+	</tr>
+
+  </tbody>
+</table>
+
+{% set rowsPerPage = 50 %}
+{% set offset = q['offset']|int %}
+{% set pages = (data['count']/rowsPerPage)|round|int %}
+
+{% if pages > 1 %}
+<nav>
+  <ul class="pagination">
+  {% if offset == 0 %}
+    <li class="disabled"><a href="#" aria-label="First"><span aria-hidden="true">&laquo;</span></a></li>
+    <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true"><</span></a></li>
+  {% else %}
+    <li><a href="#" data-q="{{qJson}}" data-offset="0" aria-label="First"><span aria-hidden="true">&laquo;</span></a></li>
+    <li><a href="#" data-q="{{qJson}}" data-offset="{{offset-1}}" aria-label="Next"><span aria-hidden="true"><</span></a></li>
+  {% endif %}
+  
+  {% if offset == 0 or offset == 1 %}
+    {% set s = 0 %}
+  {% elif offset == pages - 1 or offset == pages - 2%}
+  	{% set s = pages - 5 %}
+  {% else %}
+  	{% set s = offset - 2 %}
+  {% endif %}  
+  
+  {% for x in range(s,s+5) %}
+    <li {% if x==offset%}class="active"{% endif %}><a href="#" data-q="{{qJson}}" data-offset="{{x}}">{{x+1}}</a></li>
+  {% endfor %}
+    
+  {% if offset == pages %}
+    <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">></span></a></li>
+    <li class="disabled"><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+  {% else %}
+    <li><a href="#" data-q="{{qJson}}" data-offset="{{offset+1}}" aria-label="Next"><span aria-hidden="true">></span></a></li>
+    <li><a href="#" data-q="{{qJson}}" data-offset="{{pages-1}}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+  {% endif %}
+    
+  </ul>
+</nav>
+{% endif %}
+
+{% endif %}
