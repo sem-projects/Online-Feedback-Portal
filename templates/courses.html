@@ -6,7 +6,7 @@
     <link rel="apple-touch-icon" sizes="76x76" href="../static/img/apple-icon.png" />
     <link rel="icon" type="image/png" href="../static/img/favicon.png" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <title>Questions Form</title>
+    <title>Courses</title>
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <meta name="viewport" content="width=device-width" />
     <!-- Bootstrap core CSS     -->
@@ -35,6 +35,7 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    color: #000;
 }
 
 /* Hide the browser's default checkbox */
@@ -51,7 +52,7 @@
     left: 0;
     height: 25px;
     width: 25px;
-    background-color: #eee;
+    background-color: #BBB;
 }
 
 /* On mouse-over, add a grey background color */
@@ -117,12 +118,6 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{url_for('courses')}}">
-                            <i class="material-icons">library_books</i>
-                            <p>Select Courses</p>
-                        </a>
-                    </li>
-                    <li>
                         <a href="{{url_for('query')}}">
                             <i class="material-icons">content_paste</i>
                             <p>Query</p>
@@ -143,7 +138,8 @@
             <li>
                         <a href="{{url_for('notifications')}}">
                             <i class="material-icons">sms</i>
-                            {% if notifications is none %}<p>Notifications</p>{% else %}<p style="color:red;">Notifications</p>{% endif %}
+                            <p>Notifications</p>
+                           <!-- {% if notifications is none %}<p>Notifications</p>{% else %}<p style="color:red;">Notifications</p>{% endif %}-->
                         </a>
                     </li>
                     <li>
@@ -161,62 +157,35 @@
                 <div class="container-fluid">
                     <div class="card">
                         <div class="card-header" data-background-color="purple">
-                            <h4 class="title">Questions</h4>
-                            <p class="category">Handcrafted by Admin
+                            <h4 class="title">Courses</h4>
+                            <p class="category">Select Your Own Courses
                                 
                             </p>
                         </div>
-
+                        <form method="POST" action="">
                         <div class="card-content">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <h5>Question Style</h5>
                                     <div class="jumbotron" style="">
-					<div class=row">
-					<div class="col-md-7">
-                                        	<span>This is a plain notification</span>
-					</div>
-					<div class="col-md-1">
-						<label class="container">One
-  						<input type="checkbox" class="group1">
-  						<span class="checkmark"></span>
-						</label>					
-					</div>
-					<div class="col-md-1">
-						<label class="container">Two
-  						<input type="checkbox" class="group1">
-  						<span class="checkmark"></span>
-						</label>					
-					</div>
-					<div class="col-md-1">
-						<label class="container">Three
-  						<input type="checkbox" class="group1">
-  						<span class="checkmark"></span>
-						</label>					
-					</div>
-					<div class="col-md-1">
-						<label class="container">Four
-  						<input type="checkbox" class="group1">
-  						<span class="checkmark"></span>
-						</label>					
-					</div>
-					<div class="col-md-1">
-						<label class="container">Five
-  						<input type="checkbox" class="group1">
-  						<span class="checkmark"></span>
-						</label>					
-					</div>
-
-
-
-					
-					</div>
+                                        {% for course in courses %}
+                    					<div class="row">
+                    					<div class="col-md-12">
+                    						<label class="container">{{course[0].upper()}} : {{course[1]}}
+                      						<input type="checkbox" class="group1" name="{{course[0]}}">
+                      						<span class="checkmark"></span>
+                    						</label>					
+                    					</div>
+                                        </div>
+                                        {% endfor %}
+                    					
                                     </div>
                                 </div>
                             </div>
                             <br>
                             <br>
                         </div>
+                        <center><button type="submit" class="btn btn-primary">Select</button></center>
+                    </form>
                     </div>
                 </div>
             </div>

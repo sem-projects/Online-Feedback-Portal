@@ -3,34 +3,108 @@ import sqlite3
 from functools import wraps
 from flask import Flask,render_template,redirect, url_for,request,session,flash
 import os
+import random
 from flask_sqlite_admin.core import sqliteAdminBlueprint
+from flask_mail import Mail, Message
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.admin import Admin
+from flask.ext.admin.contrib.sqla import ModelView
+from flask import Flask, request, flash, url_for, redirect, render_template
+from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__, static_url_path='/static')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.sqlite3'
+app.config['SECRET_KEY'] = "random string"
+
+db = SQLAlchemy(app)
+class students(db.Model):
+	id = db.Column('student_id', db.Integer, primary_key = True)
+	name = db.Column(db.String(100))
+	city = db.Column(db.String(50))
+	addr = db.Column(db.String(200)) 
+	pin = db.Column(db.String(10))
+
+	def __init__(self, name, city, addr,pin):
+		self.name = name
+		self.city = city
+		self.addr = addr
+		self.pin = pin
+
+class courses(db.Model):
+	course_code = db.Column('course_code', db.String(20), primary_key = True)
+	course_name = db.column(db.String(40))
+	credits = db.column(db.Integer)
+	department = db.column(db.String(40))
+	semester = db.column(db.Integer)
+	def __init__(self, course_code, course_name, credits,department,semester):
+		self.course_code = course_code
+		self.course_name = course_name
+		self.credits = credits
+		self.department = department
+		self.semester = semester
 
 
-conn = sqlite3.connect('database.db')
+
+
+'''@app.route('/new', methods = ['GET', 'POST'])
+def new():
+   if request.method == 'POST':
+      if not request.form['name'] or not request.form['city'] or not request.form['addr']:
+         flash('Please enter all the fields', 'error')
+      else:
+         student = students(request.form['name'], request.form['city'],
+            request.form['addr'], request.form['pin'])
+         
+         db.session.add(student)
+         db.session.commit()
+         flash('Record was successfully added')
+         return redirect(url_for('show_all'))
+   return render_template('new.html')'''
+
+conn = sqlite3.connect('students.sqlite3')
+print ("Opened database successfully")
+cur = conn.cursor()
+cur.execute("SELECT * FROM students")
+al = cur.fetchall()
+print (al)
+conn.close()
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'iit2016047@iiita.ac.in'
+app.config['MAIL_PASSWORD'] = 'cricketstar'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
+mail = Mail(app)
+
+
+sqliteAdminBP = sqliteAdminBlueprint(dbPath = 'students.sqlite3')
+'''conn = sqlite3.connect('database.db')
 print ("Opened database successfully")
 
 sqliteAdminBP = sqliteAdminBlueprint(dbPath = 'database.db')
 #app.register_blueprint(sqliteAdminBP, url_prefix='/admin')
 
-conn.execute('CREATE TABLE IF NOT EXISTS users ( email TEXT primary key, username TEXT,name TEXT, dob DATE, pass TEXT, type TEXT)')
-print ("USERS Table created successfully")
-
-conn.execute('CREATE TABLE IF NOT EXISTS users_courses (S_no integer not null primary key AUTOINCREMENT,username TEXT,course_code TEXT)')
-print ("USERS_courses Table created successfully")
-
-conn.execute('CREATE TABLE IF NOT EXISTS admin (email TEXT primary key, pass TEXT)')
-print ("ADMIN Table created successfully")
-
-conn.execute('CREATE TABLE IF NOT EXISTS courses (S_no integer not null primary key AUTOINCREMENT,course_code TEXT,couse_name TEXT, credits INT, department TEXT)')
+conn.execute('CREATE TABLE IF NOT EXISTS courses (course_code TEXT primary key,couse_name TEXT, credits INT, department TEXT, semester INT)')
 print ("COURSES Table created successfully")
 
-conn.execute('CREATE TABLE IF NOT EXISTS query (S_no integer not null primary key AUTOINCREMENT,username TEXT,query TEXT,reply_to_query TEXT,seen integer)')
+conn.execute('CREATE TABLE IF NOT EXISTS users ( email TEXT primary key, username TEXT,name TEXT, dob DATE, pass TEXT, type TEXT, semester INT,department TEXT,is_active INT,secret_key INT)')
+print ("USERS Table created successfully")
+
+conn.execute('CREATE TABLE IF NOT EXISTS users_courses (S_no integer not null primary key AUTOINCREMENT,useremail TEXT,course_code TEXT, foreign key(useremail) references users(email),foreign key (course_code) references courses(course_code))')
+print ("USERS_courses Table created successfully")
+
+conn.execute('CREATE TABLE IF NOT EXISTS admin (username TEXT primary key, pass TEXT, email TEXT)')
+print ("ADMIN Table created successfully")
+
+conn.execute('CREATE TABLE IF NOT EXISTS query (S_no integer not null primary key AUTOINCREMENT,useremail TEXT,query TEXT,reply_to_query TEXT,seen integer,foreign key (useremail) references users(email))')
 print ("QUERY Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS questions (question_id TEXT primary key, question_type TEXT, question TEXT)')
+print ("QUESTIONS Table created successfully")
+
+conn.execute('CREATE TABLE IF NOT EXISTS question_answer (S_no integer not null primary key AUTOINCREMENT,question_id TEXT, useremail TEXT,foreign key (useremail) references users(email),foreign key (question_id) references questions(question_id))')
 print ("QUESTIONS Table created successfully")
 
 conn.execute('CREATE TABLE IF NOT EXISTS rating (r_id integer not null primary key AUTOINCREMENT,course_code TEXT, question_id TEXT, faculty_email TEXT,student_email TEXT,rating INT)')
@@ -42,10 +116,10 @@ print (al)
 cur.execute("SELECT * FROM query")
 al = cur.fetchall()
 print (al)
-conn.close()
+conn.close()'''
 
 
-@app.route('/adminlogin', methods=['POST'])
+'''@app.route('/adminlogin', methods=['POST'])
 def admin_login():
     if request.form['password'] == 'password' and request.form['username'] == 'admin':
         session['admin_logged_in'] = True
@@ -79,10 +153,10 @@ def do_admin_login(func):
 
 
 sqliteAdminBP = sqliteAdminBlueprint(
-  dbPath = 'database.db',
+  dbPath = 'students.sqlite3',
   decorator = do_admin_login
 )	
-app.register_blueprint(sqliteAdminBP, url_prefix='/admin')
+app.register_blueprint(sqliteAdminBP, url_prefix='/admin')'''
 
 
 
@@ -120,7 +194,12 @@ def login():
 			message = "the user does not exists please register"
 		if data !=0:
 			print('Component %s found in %s row(s)'%(username,data))
-			curr.execute("SELECT count(*) FROM users WHERE email = (?) and pass = (?)",(username,password,))
+			curr.execute("SELECT count(*) FROM users WHERE email = (?) and is_active = (?)",(username,1))
+			check = curr.fetchone()[0]
+			if check==0:
+				return render_template("login.html",message = "Please verify your email first")
+
+			curr.execute("SELECT count(*) FROM users WHERE email = (?) and pass = (?) and is_active = (?)",(username,password,1))
 			print ("pass2")
 			check = curr.fetchone()[0]
 			print (check)
@@ -178,13 +257,33 @@ def register():
 				user_type = "Student"
 			else:
 				user_type = "Faculty"
-			cur.execute("INSERT INTO USERS (email,username,name,dob,pass,type) values (?,?,?,?,?,?)",\
-				(email,email.split("@")[0],nm,dob,password,user_type,))	
+			secret = random.randint(1000324312,10000000000123)
+			conn = sqlite3.connect('database.db')
+			cur = conn.cursor()
+			cur.execute("INSERT INTO USERS (email,username,name,dob,pass,type,is_active,secret_key) values (?,?,?,?,?,?,?,?)",\
+				(email,email.split("@")[0],nm,dob,password,user_type,0,secret))	
 			print ("insert into user success")
 			conn.commit() 
 			conn.close()
+			msg = Message('Hello', sender = 'iit2016047@iiita.ac.in', recipients = [email])
+			msg.body = "Hello confirm your email " + "http://127.0.0.1:5000/emailverify/"+email.split("@")[0]+"/"+str(secret)
+			mail.send(msg)
 			return redirect(url_for('login'))
 	return render_template("student_register.html", message = message)
+
+
+@app.route('/emailverify/<id>/<key>')
+def validemail(id,key):
+	conn = sqlite3.connect('database.db')
+	cur = conn.cursor()
+	cur.execute("SELECT secret_key FROM users WHERE username = (?)",(id,))
+	users = cur.fetchone()[0]
+	if users==int(key):
+		cur.execute("UPDATE users set is_active = (?) where username = (?)",(1,id))
+		conn.commit()
+		conn.close()
+	return redirect(url_for('login'))
+
 
 
 @app.route('/dashboard/<id>')
@@ -195,13 +294,13 @@ def dashboard(id):
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
 		users = cur.fetchone()
-		cur.execute("SELECT courses.course_code,couse_name,credits,department FROM users_courses,courses WHERE username = (?) and users_courses.course_code = courses.course_code",(id,))
+		cur.execute("SELECT courses.course_code,couse_name,credits,department FROM users_courses,courses WHERE useremail = (?) and users_courses.course_code = courses.course_code",(id+"@iiita.ac.in",))
 		courses = cur.fetchall()
 		#cur.execute("SELECT * FROM query where username = (?) and reply_to_query = (?)",(id,));
 		print users
 		print courses
 		cur = conn.cursor()
-		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
@@ -224,7 +323,7 @@ def facultydashboard(id):
 		print users
 		print courses
 		cur = conn.cursor()
-		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
@@ -243,7 +342,7 @@ def profile(id):
 			cur = conn.cursor()
 			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 			users = cur.fetchone()
-			cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
 			notifications = cur.fetchall()
 			if notifications==[]:
 				notifications=None
@@ -255,7 +354,7 @@ def profile(id):
 			cur = conn.cursor()
 			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 			users = cur.fetchone()
-			cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
 			notifications = cur.fetchall()
 			if notifications==[]:
 				notifications=None
@@ -263,15 +362,35 @@ def profile(id):
 			email=request.form.get('mail',)
 			dob = str(request.form.get('dob',))
 			sem = request.form.get('sem',)
-			mob = request.form.get('mob',)
+			depart = request.form.get('depart',)
 			message = "profile editied successfully"
-			cur.execute("UPDATE users SET name = (?) , dob = (?) WHERE username = (?)",(nm,dob,current,))
+			cur.execute("UPDATE users SET name = (?) , dob = (?) , semester = (?) , department = (?) WHERE username = (?)",(nm,dob,sem,depart,current,))
 			conn.commit()
 			conn.close()
 			return render_template("user.html",users=users,notifications=notifications,message=message)
 	
 	return redirect(url_for('login'))
 
+@app.route('/courses',methods = ['GET','POST'])
+def courses():
+	global currrent
+	if session.get('logged_in'):
+		if request.method == 'POST':
+			conn = sqlite3.connect('database.db')
+			cur = conn.cursor()
+			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+			users = cur.fetchone()
+			cur.execute("SELECT type from users where username = (?)",(current,))
+			type = cur.fetchone()[0]
+			cur.execute("SELECT semester from users where username = (?)",(current,))
+			sem = cur.fetchone()[0]
+			if type == "Student" :
+				cur.execute("SELECT course_code,course_name from courses where semester = (?) ",(sem,))
+				courses = cur.fetchall()
+			else :
+				cur.execute("SELECT course_code,course_name from courses order by semester ")
+				courses = cur.fetchall()
+			return render_template("courses.html",users=users,courses=courses)
 
 
 @app.route('/query',methods = ['GET','POST'])
@@ -307,20 +426,32 @@ def query():
 def feedback(pid=None):
 	global current
 	if session.get('logged_in'):
-		conn = sqlite3.connect('database.db')
-		cur = conn.cursor()
-		cur.execute("SELECT * FROM questions")
-		questions = cur.fetchall()
-		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(current,0,))
-		notifications = cur.fetchall()
-		if notifications==[]:
-			notifications=None
-		
-		if pid == None:
-			cur.execute("SELECT * FROM users WHERE type = (?)",('Faculty',))	
-			teachers = cur
-			return render_template("feedback.html",questions = None,users = current,teachers = teachers)
-		conn.close()
+		if request.method == 'GET' :
+			conn = sqlite3.connect('database.db')
+			cur = conn.cursor()
+			cur.execute("SELECT * FROM questions")
+			questions = cur.fetchall()
+			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
+			notifications = cur.fetchall()
+			if notifications==[]:
+				notifications=None
+			
+			if pid == None:
+				cur.execute("SELECT * FROM users WHERE type = (?)",('Faculty',))	
+				teachers = cur
+				return render_template("feedback.html",questions = None,users = current,teachers = teachers)
+
+		if request.method == 'POST' :
+			conn = sqlite3.connect('database.db')
+			cur = conn.cursor()
+			cur.execute("SELECT * FROM questions")
+			questions = cur.fetchall()
+			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
+			notifications = cur.fetchall()
+			if notifications==[]:
+				notifications=None
+			faculty = request.form.get('facultyname',)
+			return render_template("questions.html",questions = questions,users = current , techers = teachers)
 	return redirect(url_for('login'))
 
 
@@ -333,7 +464,7 @@ def question(id):
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
-		cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
@@ -353,7 +484,7 @@ def change_password(id):
 			cur = conn.cursor()
 			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 			users = cur.fetchone()
-			cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
 			notifications = cur.fetchall()
 			if notifications==[]:
 				notifications=None
@@ -364,7 +495,7 @@ def change_password(id):
 			cur = conn.cursor()
 			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 			users = cur.fetchone()
-			cur.execute("SELECT * FROM query WHERE username = (?) and seen = (?)",(id,0,))
+			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
 			notifications = cur.fetchall()
 			if notifications==[]:
 				notifications=None
@@ -399,7 +530,7 @@ def notifications():
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
-		cur.execute("UPDATE query SET seen = (?) WHERE username = (?) and seen = (?)",(1,current,0,))
+		cur.execute("UPDATE query SET seen = (?) WHERE useremail = (?) and seen = (?)",(1,current+"@iiita.ac.in",0,))
 		conn.commit()
 		conn.close()
 		return render_template("notifications.html",users=users)
@@ -415,9 +546,11 @@ def logout():
 	return redirect(url_for('login'))
 
 
-
 if __name__ == '__main__':
 	app.debug = True
 	app.secret_key = os.urandom(12)
+	admin = Admin(app)
+	admin.add_view(ModelView(students,db.session))
+	db.create_all()
 	app.run()
-	app.run(debug = True)	
+	app.run(debug = True)

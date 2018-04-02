@@ -48,6 +48,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{url_for('courses')}}">
+                            <i class="material-icons">library_books</i>
+                            <p>Select Courses</p>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{url_for('query')}}">
                             <i class="material-icons">content_paste</i>
                             <p>Query</p>
@@ -92,11 +98,11 @@
                                 </div>
                                 <div class="card-content">
                          		<div class="row">
-						<div class="col-md-4"></div>
+						<div class="col-md-4" style="padding: 20px;text-align: center;font-size: 20px;">Choose Faculty  :</div>
 						<div class="col-md-4">
 						
 						 <div class="dropdown" >
-						  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select Whome to give Feedback
+						  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" name="facultyname">Select Whome to give Feedback
 						  <span class="caret"></span></button>
 						  <ul class="dropdown-menu">
                             {% for item in teachers %}
@@ -120,7 +126,7 @@
                         <script>
                             document.write(new Date().getFullYear())
                         </script>
-                        <a href="./dashboard.html">Group-12</a>, made with love for a better web
+                        <a href="./dashboard.html">Group-12</a>
                     </p>
                 </div>
             </footer>

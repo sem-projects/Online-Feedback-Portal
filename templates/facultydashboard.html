@@ -35,37 +35,43 @@
             <div class="sidebar-wrapper">
                 <ul class="nav">
                      <li class="active">
-                        <a href="facultydashboard.html">
+                        <a href="facultydashboard.html,id=users[1])}}">
                             <i class="material-icons">dashboard</i>
                             <p>Dashboard</p>
                         </a>
                     </li>
                     <li>
-                        <a href="">
+                        <a href="{{url_for('profile',id=users[1])}}">
                             <i class="material-icons">person</i>
                             <p>User Profile</p>
                         </a>
                     </li>
                     <li>
-                        <a href="">
+                        <a href="{{url_for('courses')}}">
+                            <i class="material-icons">library_books</i>
+                            <p>Select Courses</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{url_for('query')}}">
                             <i class="material-icons">content_paste</i>
                             <p>Query</p>
                         </a>
                     </li>
                     <li>
-                        <a href="">
+                        <a href="{{url_for('feedback')}}">
                             <i class="material-icons">library_books</i>
                             <p>Feedback Analysis</p>
                         </a>
                     </li>
             <li>
-                        <a href="">
+                        <a href="{{url_for('change_password',id=users[1])}}">
                             <i class="fa fa-key"></i>
                             <p>Change Password</p>
                         </a>
                     </li>
             <li>
-                        <a href="">
+                        <a href="{{url_for('notifications')}}">
                             <i class="material-icons">sms</i>
                             <p>Notifications</p>
                            <!--{% if notifications is none %}<p>Notifications</p>{% else %}<p style="color:red;">Notifications</p>{% endif %}-->

@@ -48,6 +48,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="">
+                            <i class="material-icons">library_books</i>
+                            <p>Select Courses</p>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{url_for('query')}}">
                             <i class="material-icons">content_paste</i>
                             <p>Query</p>
@@ -119,13 +125,13 @@
                                             <div class="col-md-4">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Semester</label>
-                                                    <input name="sem" type="text" class="form-control">
+                                                    <input name="sem" type="text" class="form-control" value="{{users[6]}}">
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group label-floating">
-                                                    <label class="control-label">Mobile No.</label>
-                                                    <input name="mob" type="text" class="form-control">
+                                                    <label class="control-label">Department</label>
+                                                    <input name="depart" type="text" class="form-control" value="{{users[7]}}">
                                                 </div>
                                             </div>
                                         </div>
