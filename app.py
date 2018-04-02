@@ -59,6 +59,37 @@ class users(db.Model):
 		self.is_active = is_active
 		self.secret_key = secret_key
 
+class user_courses(db.Model):
+	S_no = db.Column(db.Integer, primary_key = True, AUTOINCREMENT)
+	useremail = db.Column(db.String(40), ForeignKey('users.email'))
+	course_code = db.Column(db.String(20), ForeignKey('courses.course_code'))
+	def __init__(self,useremail, course_code):
+		self.useremail = useremail
+		self.course_code = course_code
+
+class admin(db.Model):
+	username = db.Column(db.String(40), primary_key = True)
+	password = db.Column(db.String(40))
+	email = db.Column(db.String(40))
+	def __init__(self,username,password,email):
+		self.username = username
+		self.password = password
+		self.email = email
+
+class query(db.Model):
+	S_no = db.Column(db.Integer, primary_key = True, AUTOINCREMENT)
+	useremail = db.Column(db.String(40), ForeignKey('users.email'))
+	query = db.Column(db.String(40))
+	reply_to_query = db.Column(db.String(40))
+	seen = db.Column(db.Integer)
+	
+	def __init__(self,useremail,query,reply_to_query,seen):
+		self.useremail = useremail 
+		self.query = query
+		self.reply_to_query = reply_to_query
+		self.seen = seen
+
+
 
 
 
