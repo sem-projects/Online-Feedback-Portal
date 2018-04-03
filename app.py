@@ -6,12 +6,12 @@ import os
 import random
 #from flask_sqlite_admin.core import sqliteAdminBlueprint
 from flask_mail import Mail, Message
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.admin import Admin
-from flask.ext.admin.contrib.sqla import ModelView
-from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+from flask import Flask, request, flash, url_for, redirect, render_template
+from flask_sqlalchemy import SQLAlchemy 
+from function import _sa_class_manager
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.sqlite3'
@@ -60,9 +60,9 @@ class users(db.Model):
 		self.secret_key = secret_key
 
 class user_courses(db.Model):
-	S_no = db.Column(db.Integer, primary_key = True, AUTOINCREMENT)
-	useremail = db.Column(db.String(40), ForeignKey('users.email'))
-	course_code = db.Column(db.String(20), ForeignKey('courses.course_code'))
+	S_no = db.Column(db.Integer, primary_key = True, autoincrement=True)
+	useremail = db.Column(db.String(40), db.ForeignKey('users.email'))
+	course_code = db.Column(db.String(20),db.ForeignKey('courses.course_code'))
 	def __init__(self,useremail, course_code):
 		self.useremail = useremail
 		self.course_code = course_code
@@ -77,8 +77,8 @@ class admin(db.Model):
 		self.email = email
 
 class query(db.Model):
-	S_no = db.Column(db.Integer, primary_key = True, AUTOINCREMENT)
-	useremail = db.Column(db.String(40), ForeignKey('users.email'))
+	S_no = db.Column(db.Integer, primary_key = True, autoincrement=True)
+	useremail = db.Column(db.String(40), db.ForeignKey('users.email'))
 	query = db.Column(db.String(40))
 	reply_to_query = db.Column(db.String(40))
 	seen = db.Column(db.Integer)
