@@ -4,35 +4,36 @@ from functools import wraps
 from flask import Flask,render_template,redirect, url_for,request,session,flash
 import os
 import random
-#from flask_sqlite_admin.core import sqliteAdminBlueprint
+from flask_sqlite_admin.core import sqliteAdminBlueprint
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy 
-from function import _sa_class_manager
+
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.sqlite3'
 app.config['SECRET_KEY'] = "random string"
-
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://///C:/Users/DELL/new/DBMS-Project/dbms.db'
 db = SQLAlchemy(app)
 
 class courses(db.Model):
 	__tablename__ = 'courses'
-	course_code = db.Column(db.String(20), primary_key = True)
-	course_name = db.column(db.String(40))
-	credits = db.column(db.Integer)
-	department = db.column(db.String(40))
-	semester = db.column(db.Integer)
+	course_code = db.Column(db.String(20), primary_key=True)
+	course_name = db.Column(db.String(40))
+	credits = db.Column(db.Integer)
+	semester = db.Column(db.Integer)
+	department = db.Column(db.String(40))
 
 	def __init__(self, course_code, course_name, credits,department,semester):
 		self.course_code = course_code
 		self.course_name = course_name
 		self.credits = credits
-		self.department = department
 		self.semester = semester
+		self.department = department
+		
 
 class users(db.Model):
 	__tablename__ = 'users'
@@ -59,7 +60,7 @@ class users(db.Model):
 		self.is_active = is_active
 		self.secret_key = secret_key
 
-class user_courses(db.Model):
+class users_courses(db.Model):
 	S_no = db.Column(db.Integer, primary_key = True, autoincrement=True)
 	useremail = db.Column(db.String(40), db.ForeignKey('users.email'))
 	course_code = db.Column(db.String(20),db.ForeignKey('courses.course_code'))
@@ -90,7 +91,21 @@ class query(db.Model):
 		self.seen = seen
 
 
+class question(db.Model):
+	S_no = db.Column(db.Integer,primary_key=True, autoincrement=True)
+	question_type = db.Column(db.String(30))
+	question = db.Column(db.String(200))
 
+
+
+
+
+db.create_all()
+admin = Admin(app)
+admin.add_view(ModelView(courses,db.session))
+admin.add_view(ModelView(users,db.session))
+admin.add_view(ModelView(users_courses,db.session))
+admin.add_view(ModelView(query,db.session))
 
 
 
@@ -303,9 +318,9 @@ def register():
 			cur = conn.cursor()
 			cur.execute("INSERT INTO USERS (email,username,name,dob,password,type1,is_active,secret_key) values (?,?,?,?,?,?,?,?)",\
 				(email,email.split("@")[0],nm,dob,password,user_type,0,secret))	
-			print ("insert into user success")
 			conn.commit() 
 			conn.close()
+			print ("insert into user success")
 			msg = Message('Hello', sender = 'iit2016047@iiita.ac.in', recipients = [email])
 			msg.body = "Hello confirm your email " + "http://127.0.0.1:5000/emailverify/"+email.split("@")[0]+"/"+str(secret)
 			mail.send(msg)
@@ -327,6 +342,17 @@ def validemail(id,key):
 
 
 
+@app.route('/admin_course/add',methods=['GET','POST'])
+def admin_course_add():
+	if request.method=="POST":
+		conn = sqlite3.connect('students.sqlite3')
+		cur = conn.cursor()
+		cur.execute("INSERT into courses values (?,?,?,?,?)",(request.form.get('course_id',),request.form.get('course_name',),int(request.form.get('course_credits',)),int(request.form.get('course_semester',)),request.form.get('course_department',)))
+		conn.commit()
+		conn.close()
+	return render_template("admin_course_add.html")
+
+
 @app.route('/dashboard/<id>')
 def dashboard(id):
 	global current
@@ -335,7 +361,7 @@ def dashboard(id):
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
 		users = cur.fetchone()
-		cur.execute("SELECT courses.course_code,couse_name,credits,department FROM users_courses,courses WHERE useremail = (?) and users_courses.course_code = courses.course_code",(id+"@iiita.ac.in",))
+		cur.execute("SELECT courses.course_code,courses.course_name,courses.credits,courses.department FROM users_courses,courses WHERE useremail = (?) and users_courses.course_code = courses.course_code",(id+"@iiita.ac.in",))
 		courses = cur.fetchall()
 		#cur.execute("SELECT * FROM query where username = (?) and reply_to_query = (?)",(id,));
 		print (users)
@@ -415,23 +441,28 @@ def profile(id):
 @app.route('/courses',methods = ['GET','POST'])
 def courses():
 	global currrent
+	course = None 
 	if session.get('logged_in'):
-		if request.method == 'POST':
-			conn = sqlite3.connect('students.sqlite3')
-			cur = conn.cursor()
-			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
-			users = cur.fetchone()
-			cur.execute("SELECT type from users where username = (?)",(current,))
-			type = cur.fetchone()[0]
-			cur.execute("SELECT semester from users where username = (?)",(current,))
-			sem = cur.fetchone()[0]
-			if type == "Student" :
-				cur.execute("SELECT course_code,course_name from courses where semester = (?) ",(sem,))
-				courses = cur.fetchall()
-			else :
-				cur.execute("SELECT course_code,course_name from courses order by semester ")
-				courses = cur.fetchall()
-			return render_template("courses.html",users=users,courses=courses)
+
+		if request.method=="POST":
+			pass
+
+		conn = sqlite3.connect('students.sqlite3')
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+		users = cur.fetchone()
+		cur.execute("SELECT type1 from users where username = (?)",(current,))
+		type1 = cur.fetchone()[0]
+		cur.execute("SELECT semester from users where username = (?)",(current,))
+		sem = int(cur.fetchone()[0])
+		if type1 == "Student" :
+			cur.execute("SELECT course_code,course_name from courses where semester = (?) ",(sem,))
+			course = cur.fetchall()
+		else :
+			cur.execute("SELECT course_code,course_name from courses order by semester ")
+			course = cur.fetchall()
+		return render_template("courses.html",users=users,courses=course)
+	return redirect(url_for('login'))
 
 
 @app.route('/query',methods = ['GET','POST'])
@@ -453,8 +484,8 @@ def query():
 			print ("query post")
 			qu = request.form.get('query',)
 			print (qu)
-			cur.execute("INSERT INTO query (username,query,reply_to_query,seen) values (?,?,?,?)",\
-				(current,qu,None,0,))
+			cur.execute("INSERT INTO query (useremail,query,reply_to_query,seen) values (?,?,?,?)",\
+				(current+"@iiita.ac.in",qu,None,0,))
 			conn.commit()
 			print ("query updated")
 			conn.close()
@@ -540,7 +571,7 @@ def change_password(id):
 			notifications = cur.fetchall()
 			if notifications==[]:
 				notifications=None
-			cur.execute("SELECT pass FROM users WHERE username = (?)",(current,))
+			cur.execute("SELECT password FROM users WHERE username = (?)",(current,))
 			currpass = cur.fetchone()
 			old1 = request.form.get("old1",)
 			new1 = request.form.get("new1",)
@@ -554,7 +585,7 @@ def change_password(id):
 				return render_template("changepwd.html",users=users,notifications=notifications,message=message)
 			else:
 				message = "password changed successfully"
-				cur.execute("UPDATE users set pass = (?) where username = (?)",(new1,current,))
+				cur.execute("UPDATE users set password = (?) where username = (?)",(new1,current,))
 				conn.commit()
 				conn.close()
 				return render_template("changepwd.html",users=users,notifications=notifications,message=message)
@@ -591,7 +622,4 @@ if __name__ == '__main__':
 	app.debug = True
 	app.secret_key = os.urandom(12)
 	db.create_all()
-	admin = Admin(app)
-	admin.add_view(ModelView(courses,db.session))
-	admin.add_view(ModelView(users,db.session))
 	app.run(debug = True)
