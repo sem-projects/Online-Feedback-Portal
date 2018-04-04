@@ -4,7 +4,6 @@ from functools import wraps
 from flask import Flask,render_template,redirect, url_for,request,session,flash
 import os
 import random
-from flask_sqlite_admin.core import sqliteAdminBlueprint
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
@@ -21,6 +20,7 @@ db = SQLAlchemy(app)
 
 class courses(db.Model):
 	__tablename__ = 'courses'
+	column_display_pk = True
 	course_code = db.Column(db.String(20), primary_key=True)
 	course_name = db.Column(db.String(40))
 	credits = db.Column(db.Integer)
@@ -37,6 +37,7 @@ class courses(db.Model):
 
 class users(db.Model):
 	__tablename__ = 'users'
+	column_display_pk = True
 	email = db.Column(db.String(40),primary_key=True)
 	username = db.Column(db.String(40))
 	name = db.Column(db.String(50))
@@ -61,6 +62,7 @@ class users(db.Model):
 		self.secret_key = secret_key
 
 class users_courses(db.Model):
+	column_display_pk = True
 	S_no = db.Column(db.Integer, primary_key = True, autoincrement=True)
 	useremail = db.Column(db.String(40), db.ForeignKey('users.email'))
 	course_code = db.Column(db.String(20),db.ForeignKey('courses.course_code'))
@@ -69,6 +71,7 @@ class users_courses(db.Model):
 		self.course_code = course_code
 
 class admin(db.Model):
+	column_display_pk = True
 	username = db.Column(db.String(40), primary_key = True)
 	password = db.Column(db.String(40))
 	email = db.Column(db.String(40))
@@ -78,6 +81,7 @@ class admin(db.Model):
 		self.email = email
 
 class query(db.Model):
+	column_display_pk = True
 	S_no = db.Column(db.Integer, primary_key = True, autoincrement=True)
 	useremail = db.Column(db.String(40), db.ForeignKey('users.email'))
 	query = db.Column(db.String(40))
@@ -92,12 +96,26 @@ class query(db.Model):
 
 
 class question(db.Model):
+	column_display_pk = True
 	S_no = db.Column(db.Integer,primary_key=True, autoincrement=True)
 	question_type = db.Column(db.String(30))
 	question = db.Column(db.String(200))
 
+class rating(db.Model):
+	column_display_pk = True
+	r_id = db.Column(db.Integer,primary_key=True,autoincrement=True)
+	course_code = db.Column(db.String(30),db.ForeignKey('courses.course_code')) 
+	question_id = db.Column(db.Integer,db.ForeignKey('question.S_no')) 
+	faculty_email = db.Column(db.String(50),db.ForeignKey('users.email'))  
+	student_email = db.Column(db.String(50),db.ForeignKey('users.email'))
+	rating = db.Column(db.Integer)
 
 
+class MyModelView(ModelView):
+	column_display_pk = True
+	can_create = True
+	column_list = ('r_id', 'course_code','question_id')
+	form_columns = ['r_id', 'course_code','question_id']
 
 
 db.create_all()
@@ -106,6 +124,9 @@ admin.add_view(ModelView(courses,db.session))
 admin.add_view(ModelView(users,db.session))
 admin.add_view(ModelView(users_courses,db.session))
 admin.add_view(ModelView(query,db.session))
+admin.add_view(ModelView(question,db.session))
+admin.add_view(MyModelView(rating,db.session))
+#list_columns=['r_id','course_code','question_id','faculty_email','student_email','rating']
 
 
 
@@ -440,13 +461,9 @@ def profile(id):
 
 @app.route('/courses',methods = ['GET','POST'])
 def courses():
-	global currrent
+	global current
 	course = None 
 	if session.get('logged_in'):
-
-		if request.method=="POST":
-			pass
-
 		conn = sqlite3.connect('students.sqlite3')
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
@@ -461,7 +478,20 @@ def courses():
 		else :
 			cur.execute("SELECT course_code,course_name from courses order by semester ")
 			course = cur.fetchall()
-		return render_template("courses.html",users=users,courses=course)
+
+		if request.method=="POST":
+			for course_c in course:
+				if request.form.get(course_c[0],):
+					cur.execute("INSERT into users_courses (course_code,useremail) values (?,?)",(course_c[0],current+"@iiita.ac.in"))
+					conn.commit()
+			return redirect(url_for('dashboard',id=current))
+		
+		exist = None
+		cur.execute("SELECT * FROM users_courses WHERE useremail = (?)",(current+"@iiita.ac.in",))
+		users_cour = cur.fetchall()
+		if users_cour != []:
+			exist = True
+		return render_template("courses.html",users=users,courses=course,exist=exist)
 	return redirect(url_for('login'))
 
 
