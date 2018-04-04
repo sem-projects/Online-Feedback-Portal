@@ -95,7 +95,7 @@ class query(db.Model):
 		self.seen = seen
 
 
-class question(db.Model):
+class questions(db.Model):
 	column_display_pk = True
 	S_no = db.Column(db.Integer,primary_key=True, autoincrement=True)
 	question_type = db.Column(db.String(30))
@@ -111,21 +111,50 @@ class rating(db.Model):
 	rating = db.Column(db.Integer)
 
 
-class MyModelView(ModelView):
+class MyRatingView(ModelView):
 	column_display_pk = True
 	can_create = True
-	column_list = ('r_id', 'course_code','question_id')
-	form_columns = ['r_id', 'course_code','question_id']
+	column_list = ('r_id', 'course_code','question_id','faculty_email','student_email','rating')
+	form_columns = ['r_id', 'course_code','question_id','faculty_email','student_email','rating']
 
+class MyCourseView(ModelView):
+	column_display_pk = True
+	can_create = True
+	column_list = ('course_code', 'course_name', 'credits','semester','department')
+	form_columns = ['course_code', 'course_name', 'credits','semester','department']
+
+class MyUserView(ModelView):
+	column_display_pk = True
+	can_create = True
+	column_list = ('email','username','name','dob','password','type1','semester','department','is_active','secret_key')
+	form_columns = ['email','username','name','dob','password','type1','semester','department','is_active','secret_key']
+
+class MyUserCoursesView(ModelView):
+	column_display_pk = True
+	can_create = True
+	column_list = ('S_no','useremail', 'course_code')
+	form_columns = ['S_no','useremail', 'course_code']
+
+class MyQueryView(ModelView):
+	column_display_pk = True
+	can_create = True
+	column_list = ('S_no','useremail','query','reply_to_query','seen')
+	form_columns = ['S_no','useremail','query','reply_to_query','seen']
+
+class MyQuestionView(ModelView):
+	column_display_pk = True
+	can_create = True
+	column_list = ('S_no','question_type','question')
+	form_columns = ['S_no','question_type','question']	
 
 db.create_all()
 admin = Admin(app)
-admin.add_view(ModelView(courses,db.session))
-admin.add_view(ModelView(users,db.session))
-admin.add_view(ModelView(users_courses,db.session))
-admin.add_view(ModelView(query,db.session))
-admin.add_view(ModelView(question,db.session))
-admin.add_view(MyModelView(rating,db.session))
+admin.add_view(MyCourseView(courses,db.session))
+admin.add_view(MyUserView(users,db.session))
+admin.add_view(MyUserCoursesView(users_courses,db.session))
+admin.add_view(MyQueryView(query,db.session))
+admin.add_view(MyQuestionView(questions,db.session))
+admin.add_view(MyRatingView(rating,db.session))
 #list_columns=['r_id','course_code','question_id','faculty_email','student_email','rating']
 
 
@@ -539,7 +568,7 @@ def feedback(pid=None):
 				notifications=None
 			
 			if pid == None:
-				cur.execute("SELECT * FROM users WHERE type = (?)",('Faculty',))	
+				cur.execute("SELECT * FROM users WHERE type1 = (?)",('Faculty',))	
 				teachers = cur
 				return render_template("feedback.html",questions = None,users = current,teachers = teachers)
 
