@@ -104,11 +104,14 @@
 						 <div class="dropdown" >
 						  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" name="facultyname">Select Whome to give Feedback
 						  <span class="caret"></span></button>
-						  <ul class="dropdown-menu">
+                          <form method="POST" action="">
+						  <select class="dropdown-menu" name="pid">
                             {% for item in teachers %}
-                                            <li><a href=url_for('feedback',pid = item[1])>{{item[2]}}</a></li>
+                                            <option value="{{item[1]}}">{{item[2]}}</option>
                             {% endfor %}
-						  </ul>
+						  </select>
+                          <input type="submit" value="select">
+                        </form>
 						</div> 
 						</div>
 					</div>

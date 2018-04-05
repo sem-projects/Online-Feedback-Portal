@@ -152,13 +152,12 @@
             </div>
         </div>
         <div class="main-panel">
-            
             <div class="content">
                 <div class="container-fluid">
                     <div class="card">
                         <div class="card-header" data-background-color="purple">
                             <h4 class="title">Courses</h4>
-                            <p class="category">Select Your Own Courses
+                            <p class="category">**Select your courses very carefully because only one time choice is there any mistakes will not be entertained by admin**
                                 
                             </p>
                         </div>
@@ -171,7 +170,7 @@
                     					<div class="row">
                     					<div class="col-md-12">
                     						<label class="container">{{course[0].upper()}} : {{course[1]}}
-                      						<input type="checkbox" class="group1" name="{{course[0]}}">
+                      						{% if exist is none %} <input type="checkbox" class="group1" name="{{course[0]}}" > {% endif %}
                       						<span class="checkmark"></span>
                     						</label>					
                     					</div>

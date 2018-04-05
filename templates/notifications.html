@@ -48,6 +48,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{url_for('courses')}}">
+                            <i class="material-icons">library_books</i>
+                            <p>Select Courses</p>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{url_for('query')}}">
                             <i class="material-icons">content_paste</i>
                             <p>Query</p>
@@ -87,62 +93,20 @@
                     <div class="card">
                         <div class="card-header" data-background-color="purple">
                             <h4 class="title">Notifications</h4>
-                            <p class="category">Handcrafted by our friend
-                                <a target="_blank" href="https://github.com/mouse0270">Robert McIntosh</a>. Please checkout the
-                                <a href="http://bootstrap-notify.remabledesigns.com/" target="_blank">full documentation.</a>
+                            <p class="category">Reply To Your Queries By Admin
                             </p>
                         </div>
                         <div class="card-content">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h5>Notifications Style</h5>
-                                    <div class="alert alert-info">
-                                        <span>This is a plain notification</span>
-                                    </div>
-                                    <div class="alert alert-info">
-                                        <button type="button" aria-hidden="true" class="close">×</button>
-                                        <span>This is a notification with close button.</span>
-                                    </div>
-                                    <div class="alert alert-info alert-with-icon" data-notify="container">
-                                        <button type="button" aria-hidden="true" class="close">×</button>
-                                        <i data-notify="icon" class="material-icons">add_alert</i>
-                                        <span data-notify="message">This is a notification with close button and icon.</span>
-                                    </div>
-                                    <div class="alert alert-info alert-with-icon" data-notify="container">
-                                        <button type="button" aria-hidden="true" class="close">×</button>
-                                        <i data-notify="icon" class="material-icons">add_alert</i>
-                                        <span data-notify="message">This is a notification with close button and icon and have many lines. You can see that the icon and the close button are always vertically aligned. This is a beautiful notification. So you don't have to worry about the style.</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <h5>Notification states</h5>
-                                    <div class="alert alert-info">
-                                        <button type="button" aria-hidden="true" class="close">×</button>
-                                        <span>
-                                            <b> Info - </b> This is a regular notification made with ".alert-info"</span>
-                                    </div>
+                            {% for ans in queries_ans %}
+                            <div class="row" id="{{ans[0]}}" >
+                                <div class="col-md-9">
                                     <div class="alert alert-success">
-                                        <button type="button" aria-hidden="true" class="close">×</button>
-                                        <span>
-                                            <b> Success - </b> This is a regular notification made with ".alert-success"</span>
-                                    </div>
-                                    <div class="alert alert-warning">
-                                        <button type="button" aria-hidden="true" class="close">×</button>
-                                        <span>
-                                            <b> Warning - </b> This is a regular notification made with ".alert-warning"</span>
-                                    </div>
-                                    <div class="alert alert-danger">
-                                        <button type="button" aria-hidden="true" class="close">×</button>
-                                        <span>
-                                            <b> Danger - </b> This is a regular notification made with ".alert-danger"</span>
-                                    </div>
-                                    <div class="alert alert-primary">
-                                        <button type="button" aria-hidden="true" class="close">×</button>
-                                        <span>
-                                            <b> Primary - </b> This is a regular notification made with ".alert-primary"</span>
+                                        <button type="button" aria-hidden="true" class="close" onclick="hidethis({{ans[0]}})" >×</button>
+                                        <span> {{ans[1]}}   : {{ans[2]}}</span>
                                     </div>
                                 </div>
                             </div>
+                            {% endfor %}
                             <br>
                             <br>
                             <div class="places-buttons">
@@ -186,36 +150,12 @@
             </div>
             <footer class="footer">
                 <div class="container-fluid">
-                    <nav class="pull-left">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    Home
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Company
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Portfolio
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Blog
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
                     <p class="copyright pull-right">
                         &copy;
                         <script>
                             document.write(new Date().getFullYear())
                         </script>
-                        
+                         <a href="./dashboard.html">Group-12</a>
                     </p>
                 </div>
             </footer>
@@ -240,5 +180,13 @@
 <script src="../static/js/material-dashboard.js?v=1.2.0"></script>
 <!-- Material Dashboard DEMO methods, don't include it in your project! -->
 <script src="../static/js/demo.js"></script>
+<script type="text/javascript">
+    var sl = [];
+    function hidethis(id) {
+        var x = document.getElementById(id);
+        x.style.display = "none";
+        s1.append(id);
+    }
+</script>
 
 </html>
