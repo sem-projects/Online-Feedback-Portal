@@ -667,16 +667,26 @@ def notifications():
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
-		cur.execute("SELECT S_no,query,reply_to_query FROM query WHERE useremail = (?)",(current+"@iiita.ac.in",))
+		cur.execute("SELECT S_no,query,reply_to_query FROM query WHERE useremail = (?) and seen != (?)",(current+"@iiita.ac.in",1,))
 		queries_ans = cur.fetchall()
-		cur.execute("UPDATE query SET seen = (?) WHERE useremail = (?) and seen = (?)",(1,current+"@iiita.ac.in",0,))
-		conn.commit()
-		conn.close()
 		return render_template("notifications.html",users=users,queries_ans=queries_ans)
 
 	return redirect(url_for('login'))
-
-
+@app.route('/closenotify/<c_id>')
+def closenotify(c_id):
+	global current
+	if session.get('logged_in'):
+		conn = sqlite3.connect('students.sqlite3')
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+		users = cur.fetchone()
+		cur.execute("SELECT * FROM query WHERE S_no = (?) and useremail = (?) and seen != (?)",(c_id,current+"@iiita.ac.in",1,))
+		s_no = cur.fetchall()
+		if s_no != []:
+			cur.execute("UPDATE query set seen = (?) where S_no = (?)",(1,c_id,))
+			conn.commit()
+			conn.close()
+	return redirect(url_for('notifications')) 
 
 @app.route('/logout')
 def logout():
