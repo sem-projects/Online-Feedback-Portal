@@ -11,7 +11,6 @@ from flask_admin.contrib.sqla import ModelView
 from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy 
 
-
 app = Flask(__name__, static_url_path='/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.sqlite3'
 app.config['SECRET_KEY'] = "random string"
@@ -66,6 +65,7 @@ class query(db.Model):
 	
 
 
+
 class questions(db.Model):
 	column_display_pk = True
 	S_no = db.Column(db.Integer,primary_key=True, autoincrement=True)
@@ -117,6 +117,7 @@ class MyQuestionView(ModelView):
 	can_create = True
 	column_list = ('S_no','question_type','question')
 	form_columns = ['S_no','question_type','question']	
+
 
 db.create_all()
 admin = Admin(app)
@@ -243,6 +244,9 @@ current = None
 @app.route('/')
 def index():
    return render_template("index.html")
+
+
+
 
 @app.route('/login',methods = ['GET','POST'])
 def login():
@@ -406,6 +410,9 @@ def dashboard(id):
 		return render_template("dashboard.html",users=users,notifications=notifications,courses = courses)
 	return redirect(url_for('login'))
 
+
+
+
 @app.route('/facultydashboard/<id>')
 def facultydashboard(id):
 	global current
@@ -505,6 +512,8 @@ def courses():
 	return redirect(url_for('login'))
 
 
+
+
 @app.route('/query',methods = ['GET','POST'])
 def query():
 	global current
@@ -561,8 +570,10 @@ def feedback():
 	return redirect(url_for('login'))
 
 
+
 @app.route('/question/<f_id>/<s_id>')
 def question(f_id,s_id):
+
 	global current
 
 	if session.get('logged_in'):
@@ -580,6 +591,8 @@ def question(f_id,s_id):
 		return render_template("questions.html",users=users,notifications=notifications,questions=questions)
 
 	return redirect(url_for('login'))
+
+
 
 
 @app.route('/change_password/<id>',methods = ['GET','POST'])
@@ -648,6 +661,7 @@ def notifications():
 	return redirect(url_for('login'))
 
 
+
 @app.route('/logout')
 def logout():
 	if session.get('logged_in'):
@@ -659,5 +673,7 @@ def logout():
 if __name__ == '__main__':
 	app.debug = True
 	app.secret_key = os.urandom(12)
+
 	db.create_all()
+
 	app.run(debug = True)
