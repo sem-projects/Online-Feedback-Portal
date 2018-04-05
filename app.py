@@ -637,10 +637,12 @@ def notifications():
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
+		cur.execute("SELECT S_no,query,reply_to_query FROM query WHERE useremail = (?)",(current+"@iiita.ac.in",))
+		queries_ans = cur.fetchall()
 		cur.execute("UPDATE query SET seen = (?) WHERE useremail = (?) and seen = (?)",(1,current+"@iiita.ac.in",0,))
 		conn.commit()
 		conn.close()
-		return render_template("notifications.html",users=users)
+		return render_template("notifications.html",users=users,queries_ans=queries_ans)
 
 	return redirect(url_for('login'))
 
