@@ -42,6 +42,7 @@ class users(db.Model):
 	department = db.Column(db.String(30))
 	is_active = db.Column(db.Integer)
 	secret_key = db.Column(db.Integer)
+	image_link = db.Column(db.String(200))
 
 class users_courses(db.Model):
 	column_display_pk = True
@@ -75,7 +76,7 @@ class rating(db.Model):
 	column_display_pk = True
 	r_id = db.Column(db.Integer,primary_key=True,autoincrement=True)
 	course_code = db.Column(db.String(30),db.ForeignKey('courses.course_code')) 
-	question_id = db.Column(db.Integer,db.ForeignKey('question.S_no')) 
+	question_id = db.Column(db.Integer,db.ForeignKey('questions.S_no')) 
 	faculty_email = db.Column(db.String(50),db.ForeignKey('users.email'))  
 	student_email = db.Column(db.String(50),db.ForeignKey('users.email'))
 	rating = db.Column(db.Integer)
@@ -96,8 +97,8 @@ class MyCourseView(ModelView):
 class MyUserView(ModelView):
 	column_display_pk = True
 	can_create = True
-	column_list = ('email','username','name','dob','password','type1','semester','department','is_active','secret_key')
-	form_columns = ['email','username','name','dob','password','type1','semester','department','is_active','secret_key']
+	column_list = ('email','username','name','dob','password','type1','semester','department','is_active','secret_key','image_link')
+	form_columns = ['email','username','name','dob','password','type1','semester','department','is_active','secret_key','image_link']
 
 class MyUserCoursesView(ModelView):
 	column_display_pk = True

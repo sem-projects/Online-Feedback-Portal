@@ -65,13 +65,13 @@
                             <p>Feedback</p>
                         </a>
                     </li>
-		    <li>
+		            <li>
                         <a href="{{url_for('change_password',id=users[1])}}">
                             <i class="fa fa-key"></i>
                             <p>Change Password</p>
                         </a>
                     </li>
-		    <li>
+		            <li>
                         <a href="{{url_for('notifications')}}">
                             <i class="material-icons">sms</i>
                             {% if notifications is none %}<p>Notifications</p>{% else %}<p style="color:red;">Notifications</p>{% endif %}
@@ -107,7 +107,7 @@
                                                 </div>
                                             </div>
                                         </div>
-					<div class="row">
+					                    <div class="row">
                                             <div class="col-md-14">
                                                 <div class="form-group label-floating">
                                                     <label class="control-label">Email address</label>
@@ -149,6 +149,10 @@
                                         <img class="img" src="../static/img/faces/marc.jpg" />
                                     </a>
                                 </div>
+                                <form id="uploadbanner" enctype="multipart/form-data" method="post" action="#">
+                                    <input id="fileupload" name="myfile" type="file" style="margin-left: 120px;" />
+                                    <input type="submit" value="submit" id="submit" />
+                                </form>
                                 <div class="content">
                                     <h6 class="category text-gray">{{users[1].upper()}}</h6>
                                     <h4 class="card-title">{{users[2].upper()}}</h4>
