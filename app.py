@@ -569,12 +569,14 @@ def question(f_id,s_id):
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
+		cur.execute("SELECT * from questions")
+		questions = cur.fetchall()
 		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(s_id+"@iiita.ac.in",0,))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
 		conn.close()
-		return render_template("questions.html",qu=id,users=users,notifications=notifications)
+		return render_template("questions.html",users=users,notifications=notifications,questions=questions)
 
 	return redirect(url_for('login'))
 
