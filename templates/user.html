@@ -91,6 +91,7 @@
             <div class="content">
                 <div class="container-fluid">
                     <div class="row">
+                        <form id="uploadbanner" enctype="multipart/form-data" method="post" action="">
                         <div class="col-md-8">
                             <div class="card">
                                 <div class="card-header" data-background-color="purple">
@@ -98,7 +99,7 @@
                                     <p class="category">Complete your profile</p>
                                 </div>
                                 <div class="card-content">
-                                    <form  method="POST">
+                                    
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group label-floating">
@@ -137,22 +138,24 @@
                                         </div>
                                         <button type="submit" class="btn btn-primary pull-right">Update Profile</button>
                                         <div class="clearfix"></div>
-                                    </form>
+                                    
                                     {% if message is not none %} <h1>{{message}}</h1>{% endif %}
                                 </div>
                             </div>
+
                         </div>
+
                         <div class="col-md-4">
                             <div class="card card-profile">
                                 <div class="card-avatar">
-                                    <a href="#pablo">
-                                        <img class="img" src="../static/img/faces/marc.jpg" />
-                                    </a>
+                                    
+                                        <img id="proimg" class="img" src="../static/upload/{{users[10]}}" />
+                                    
                                 </div>
-                                <form id="uploadbanner" enctype="multipart/form-data" method="post" action="#">
-                                    <input id="fileupload" name="myfile" type="file" style="margin-left: 120px;" />
-                                    <input type="submit" value="submit" id="submit" />
-                                </form>
+                               
+                                    <input id="fileupload" name="file" type="file" style="margin-left: 120px;text-decoration: none;" />
+                                    
+                                
                                 <div class="content">
                                     <h6 class="category text-gray">{{users[1].upper()}}</h6>
                                     <h4 class="card-title">{{users[2].upper()}}</h4>
@@ -166,9 +169,11 @@
                                 </div>
                             </div>
                         </div>
+                        </form>
                     </div>
                 </div>
             </div>
+
             <footer class="footer">
                 <div class="container-fluid">
                     <p class="copyright pull-right">
@@ -200,5 +205,16 @@
 <script src="../static/js/material-dashboard.js?v=1.2.0"></script>
 <!-- Material Dashboard DEMO methods, don't include it in your project! -->
 <script src="../static/js/demo.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+
+        $("#fileupload").hide();
+        
+
+    });
+$("#proimg").click(function(){
+            $("#fileupload").toggle();
+        });
+</script>
 
 </html>

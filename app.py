@@ -10,12 +10,18 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy 
+from werkzeug import secure_filename
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.sqlite3'
 app.config['SECRET_KEY'] = "random string"
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://///C:/Users/DELL/new/DBMS-Project/dbms.db'
 db = SQLAlchemy(app)
+
+UPLOAD_FOLDER = 'static/upload'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 class courses(db.Model):
 	__tablename__ = 'courses'
@@ -441,6 +447,7 @@ def facultydashboard(id):
 def profile(id=None):
 	global current
 	message=None
+	img=None
 	if session.get('logged_in') :
 		if request.method == 'GET':
 			conn = sqlite3.connect('students.sqlite3')
@@ -468,8 +475,17 @@ def profile(id=None):
 			dob = str(request.form.get('dob',))
 			sem = request.form.get('sem',)
 			depart = request.form.get('depart',)
+			file = request.files['file']
+			if file.filename == '':
+				flash('No selected file')
+				return redirect(url_for('profile',id=current,notifications=notifications,message=message))
+			if file:
+				filename = secure_filename(file.filename)
+				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+				img = "../upload/"+filename
+			
 			message = "profile editied successfully"
-			cur.execute("UPDATE users SET name = (?) , dob = (?) , semester = (?) , department = (?) WHERE username = (?)",(nm,dob,sem,depart,current,))
+			cur.execute("UPDATE users SET name = (?) , dob = (?) , semester = (?) , department = (?), image_link = (?) WHERE username = (?)",(nm,dob,sem,depart,img,current,))
 			conn.commit()
 			conn.close()
 			return render_template("user.html",users=users,notifications=notifications,message=message)
