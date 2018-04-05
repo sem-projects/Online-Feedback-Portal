@@ -27,12 +27,6 @@ class courses(db.Model):
 	semester = db.Column(db.Integer)
 	department = db.Column(db.String(40))
 
-	def __init__(self, course_code, course_name, credits,department,semester):
-		self.course_code = course_code
-		self.course_name = course_name
-		self.credits = credits
-		self.semester = semester
-		self.department = department
 		
 
 class users(db.Model):
@@ -49,36 +43,17 @@ class users(db.Model):
 	is_active = db.Column(db.Integer)
 	secret_key = db.Column(db.Integer)
 
-	def __init__(self, email,username,name,dob,password,type1,semester,department,is_active,secret_key):
-		self.email = email
-		self.username = username
-		self.name = name
-		self.dob = dob
-		self.password= password
-		self.type1 = type1
-		self.semester = semester
-		self.department = department
-		self.is_active = is_active
-		self.secret_key = secret_key
-
 class users_courses(db.Model):
 	column_display_pk = True
 	S_no = db.Column(db.Integer, primary_key = True, autoincrement=True)
 	useremail = db.Column(db.String(40), db.ForeignKey('users.email'))
 	course_code = db.Column(db.String(20),db.ForeignKey('courses.course_code'))
-	def __init__(self,useremail, course_code):
-		self.useremail = useremail
-		self.course_code = course_code
 
 class admin(db.Model):
 	column_display_pk = True
 	username = db.Column(db.String(40), primary_key = True)
 	password = db.Column(db.String(40))
 	email = db.Column(db.String(40))
-	def __init__(self,username,password,email):
-		self.username = username
-		self.password = password
-		self.email = email
 
 class query(db.Model):
 	column_display_pk = True
@@ -88,11 +63,6 @@ class query(db.Model):
 	reply_to_query = db.Column(db.String(40))
 	seen = db.Column(db.Integer)
 	
-	def __init__(self,useremail,query,reply_to_query,seen):
-		self.useremail = useremail 
-		self.query = query
-		self.reply_to_query = reply_to_query
-		self.seen = seen
 
 
 class questions(db.Model):
@@ -176,7 +146,7 @@ def new():
 
 
 app.config['MAIL_SERVER']='smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
+app.config['MAIL_PORT'] = 80
 app.config['MAIL_USERNAME'] = 'iit2016047@iiita.ac.in'
 app.config['MAIL_PASSWORD'] = 'cricketstar'
 app.config['MAIL_USE_TLS'] = False
@@ -444,7 +414,7 @@ def facultydashboard(id):
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(id,))
 		users = cur.fetchone()
-		cur.execute("SELECT courses.course_code,couse_name,credits,department FROM users_courses,courses WHERE username = (?) and users_courses.course_code = courses.course_code",(id,))
+		cur.execute("SELECT courses.course_code,course_name,credits,department FROM users_courses,courses WHERE useremail = (?) and users_courses.course_code = courses.course_code",(id+"@iiita.ac.in",))
 		courses = cur.fetchall()
 		#cur.execute("SELECT * FROM query where username = (?) and reply_to_query = (?)",(id,));
 		print (users)
@@ -460,7 +430,7 @@ def facultydashboard(id):
 
 
 @app.route('/profile/<id>',methods = ['GET','POST'])
-def profile(id):
+def profile(id=None):
 	global current
 	message=None
 	if session.get('logged_in') :
@@ -469,7 +439,7 @@ def profile(id):
 			cur = conn.cursor()
 			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 			users = cur.fetchone()
-			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
+			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
 			notifications = cur.fetchall()
 			if notifications==[]:
 				notifications=None
@@ -509,9 +479,9 @@ def courses():
 		users = cur.fetchone()
 		cur.execute("SELECT type1 from users where username = (?)",(current,))
 		type1 = cur.fetchone()[0]
-		cur.execute("SELECT semester from users where username = (?)",(current,))
-		sem = int(cur.fetchone()[0])
 		if type1 == "Student" :
+			cur.execute("SELECT semester from users where username = (?)",(current,))
+			sem = int(cur.fetchone()[0])
 			cur.execute("SELECT course_code,course_name from courses where semester = (?) ",(sem,))
 			course = cur.fetchall()
 		else :
@@ -563,41 +533,35 @@ def query():
 	return redirect(url_for('login'))
 
 
-@app.route('/feedback/pid', methods = ['GET','POST'])
-def feedback(pid=None):
+@app.route('/feedback', methods = ['GET','POST'])
+def feedback():
 	global current
 	if session.get('logged_in'):
+		conn = sqlite3.connect('students.sqlite3')
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM questions")
+		questions = cur.fetchall()
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
+		notifications = cur.fetchall()
 		if request.method == 'GET' :
-			conn = sqlite3.connect('students.sqlite3')
-			cur = conn.cursor()
-			cur.execute("SELECT * FROM questions")
-			questions = cur.fetchall()
-			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
-			notifications = cur.fetchall()
-			if notifications==[]:
-				notifications=None
 			
-			if pid == None:
-				cur.execute("SELECT * FROM users WHERE type1 = (?)",('Faculty',))	
-				teachers = cur
-				return render_template("feedback.html",questions = None,users = current,teachers = teachers)
-
-		if request.method == 'POST' :
-			conn = sqlite3.connect('students.sqlite3')
-			cur = conn.cursor()
-			cur.execute("SELECT * FROM questions")
-			questions = cur.fetchall()
-			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
-			notifications = cur.fetchall()
 			if notifications==[]:
 				notifications=None
-			faculty = request.form.get('facultyname',)
-			return render_template("questions.html",questions = questions,users = current , techers = teachers)
+
+			cur.execute("SELECT * FROM users WHERE type1 = (?)",('Faculty',))	
+			teachers = cur.fetchall()
+			return render_template("feedback.html",questions = None,users = current,teachers = teachers)
+			
+		elif request.method == "POST":
+
+			return redirect(url_for('question',f_id=request.form.get("pid",),s_id=current))
+
+		
 	return redirect(url_for('login'))
 
 
-@app.route('/question/<id>')
-def question(id):
+@app.route('/question/<f_id>/<s_id>')
+def question(f_id,s_id):
 	global current
 
 	if session.get('logged_in'):
@@ -605,7 +569,7 @@ def question(id):
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
-		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(s_id+"@iiita.ac.in",0,))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
