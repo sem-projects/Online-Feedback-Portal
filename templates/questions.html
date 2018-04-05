@@ -3,8 +3,8 @@
 
 <head>
      <meta charset="utf-8" />
-    <link rel="apple-touch-icon" sizes="76x76" href="../static/img/feedback.png" />
-    <link rel="icon" type="image/png" href="../static/img/feedback.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="../../static/img/feedback.png" />
+    <link rel="icon" type="image/png" href="../../static/img/feedback.png" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>Question Form</title>
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
@@ -103,10 +103,10 @@
                                 <div class="col-md-12">
                                     <h5>Question Style</h5>
                                     <div class="jumbotron" style="">
-					{% for ques in questions %}
-                    <div class=row">
+                                        {% for ques in questions %}
+                    <div class="row">
 					<div class="col-md-7">
-                                        	<span>{{ques[1]}}</span><br>
+                                        	<span><strong><u>{{ques[1]}}</u>  :</strong></span><br>
                                             <span>{{ques[2]}}</span>
 					</div>
 					<div class="col-md-1">
@@ -139,12 +139,14 @@
   						<span class="checkmark"></span>
 						</label>					
 					</div>
-                    {% endfor %}
+                    
 
 
 					
 					</div>
+                    {% endfor %}
                                     </div>
+                                    <center><button type="submit" class="btn btn-primary">SUBMIT</button></center>
                                 </div>
                             </div>
                             <br>
@@ -160,7 +162,7 @@
                         <script>
                             document.write(new Date().getFullYear())
                         </script>
-                        <a href="http://www.creative-tim.com">Creative Tim</a>, made with love for a better web
+                        <a href="dashboard.html">Group-12</a>
                     </p>
                 </div>
             </footer>
