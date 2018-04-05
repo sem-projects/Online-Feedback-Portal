@@ -402,6 +402,16 @@ def admin_course_add():
 		conn.close()
 	return render_template("admin_course_add.html")
 
+@app.route('/admin_question/add',methods=['GET','POST'])
+def admin_question_add():
+	if request.method=="POST":
+		conn = sqlite3.connect('students.sqlite3')
+		cur = conn.cursor()
+		cur.execute("INSERT into questions values (?,?)",(request.form.get('question_type',),request.form.get('question',)))
+		conn.commit()
+		conn.close()
+	return render_template("admin_question_add.html")
+
 
 @app.route('/dashboard/<id>')
 def dashboard(id):
