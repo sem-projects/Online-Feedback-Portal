@@ -503,6 +503,10 @@ def courses():
 		users = cur.fetchone()
 		cur.execute("SELECT type1 from users where username = (?)",(current,))
 		type1 = cur.fetchone()[0]
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
+		notifications = cur.fetchall()
+		if notifications==[]:
+			notifications=None
 		if type1 == "Student" :
 			cur.execute("SELECT semester from users where username = (?)",(current,))
 			sem = int(cur.fetchone()[0])
@@ -524,7 +528,7 @@ def courses():
 		users_cour = cur.fetchall()
 		if users_cour != []:
 			exist = True
-		return render_template("courses.html",users=users,courses=course,exist=exist)
+		return render_template("courses.html",users=users,courses=course,exist=exist,notifications=notifications)
 	return redirect(url_for('login'))
 
 

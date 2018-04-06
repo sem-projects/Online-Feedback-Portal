@@ -99,9 +99,9 @@
         Tip 2: you can also add an image using data-image tag
     -->
             <div class="logo">
-                <a href="http://www.creative-tim.com" class="simple-text">
+                <label class="simple-text">
                     STUDENT AREA
-                </a>
+                </label>
             </div>
             <div class="sidebar-wrapper">
                 <ul class="nav">
@@ -115,6 +115,12 @@
                         <a href="{{url_for('profile',id=users[1])}}">
                             <i class="material-icons">person</i>
                             <p>User Profile</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{url_for('courses')}}">
+                            <i class="material-icons">library_books</i>
+                            <p>Select Courses</p>
                         </a>
                     </li>
                     <li>
@@ -135,11 +141,10 @@
                             <p>Change Password</p>
                         </a>
                     </li>
-            <li>
+                    <li>
                         <a href="{{url_for('notifications')}}">
                             <i class="material-icons">sms</i>
-                            <p>Notifications</p>
-                           <!-- {% if notifications is none %}<p>Notifications</p>{% else %}<p style="color:red;">Notifications</p>{% endif %}-->
+                           {% if notifications is none %}<p>Notifications</p>{% else %}<p style="color:red;"><strong>Notifications</strong></p>{% endif %}
                         </a>
                     </li>
                     <li>
