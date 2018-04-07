@@ -103,11 +103,12 @@
                                 <div class="col-md-12">
                                     <h5>Question Style</h5>
                                     <div class="jumbotron" style="">
-                                        {% for ques in questions %}
+                                        <span><strong><u>Theory Lecture</u>  :</strong></span><br>
+                                        {% for theo in theory %}
                     <div class="row">
 					<div class="col-md-7">
-                                        	<span><strong><u>{{ques[1]}}</u>  :</strong></span><br>
-                                            <span>{{ques[2]}}</span>
+                                            <span>{{loop.index}}. <span>
+                                            <span>{{theo[2]}}</span>
 					</div>
 					<div class="col-md-1">
 						<label class="container">One
@@ -146,9 +147,149 @@
 					</div>
                     {% endfor %}
                                     </div>
+                                    <div class="jumbotron" style="">
+                                        <span><strong><u>Classroom Ability</u>  :</strong></span><br>
+                                        {% for clas in classroom %}
+                    <div class="row">
+                    <div class="col-md-7">
+                                            <span>{{loop.index}}. <span>
+                                            <span>{{clas[2]}}</span>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">One
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Two
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Three
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Four
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Five
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    
+
+
+                    
+                    </div>
+                    {% endfor %}
+                                    </div>
+                                    <div class="jumbotron" style="">
+                                        <span><strong><u>Assignment And Quiz</u>  :</strong></span><br>
+                                        {% for ass in assn %}
+                    <div class="row">
+                    <div class="col-md-7">
+                                            <span>{{loop.index}}. <span>
+                                            <span>{{ass[2]}}</span>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">One
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Two
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Three
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Four
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Five
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    
+
+
+                    
+                    </div>
+                    {% endfor %}
+                                    </div>
+                                    {% if lab_occurs is none %}
                                     <center><button type="submit" class="btn btn-primary">SUBMIT</button></center>
+                                    {% else %}
+                                    <div class="jumbotron" style="">
+                                        <span><strong><u>Lab</u>  :</strong></span><br>
+                                        {% for l in lab %}
+                    <div class="row">
+                    <div class="col-md-7">
+                                            <span>{{loop.index}}. <span>
+                                            <span>{{l[2]}}</span>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">One
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Two
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Three
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Four
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    <div class="col-md-1">
+                        <label class="container">Five
+                        <input type="checkbox" class="group1">
+                        <span class="checkmark"></span>
+                        </label>                    
+                    </div>
+                    
+
+
+                    
+                    </div>
+                    {% endfor %}
+                                    </div>
+                                    <center><button type="submit" class="btn btn-primary">SUBMIT</button></center>
+                                {% endif %}
                                 </div>
                             </div>
+
                             <br>
                             <br>
                         </div>

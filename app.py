@@ -571,28 +571,58 @@ def feedback():
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM questions")
 		questions = cur.fetchall()
+		cur.execute("SELECT department FROM users WHERE username = (?)",(current,))
+		department = cur.fetchone()[0]
 		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
 		notifications = cur.fetchall()
 		if request.method == 'GET' :
 			
 			if notifications==[]:
 				notifications=None
+			select_teacher=request.args.get('prof')
+			print(select_teacher)
+			if select_teacher == None:
+				teacher = None
+				courses = None
+			else:
+				teacher = select_teacher
+				cur.execute("SELECT course_code from users_courses where useremail = (?)",(select_teacher+"@iiita.ac.in",))
+				courses_teacher=cur.fetchall()
+				cur.execute("SELECT course_code from users_courses where useremail = (?)",(current+"@iiita.ac.in",))
+				courses_student=cur.fetchall()
+				courses=[]
+				for c in courses_teacher:
+					for cour in courses_student:
+						if c[0]==cour[0]:
+							courses.append(c)
 
-			cur.execute("SELECT * FROM users WHERE type1 = (?)",('Faculty',))	
-			teachers = cur.fetchall()
-			return render_template("feedback.html",questions = None,users = current,teachers = teachers)
+			cur.execute("SELECT * FROM users WHERE type1 = (?) ",('Faculty',))	
+			teach = cur.fetchall()
+			cur.execute("SELECT course_code from users_courses where useremail = (?)",(current+"@iiita.ac.in",))
+			courses_stu=cur.fetchall()
+			teachers = []
+			for t in teach:
+				for c in courses_stu:
+					print(00000000000000)
+					cur.execute("SELECT * from users_courses where useremail = (?) and course_code = (?)",(t[0],c[0],))
+					courses_stu1=cur.fetchall()
+					if courses_stu1 != []:
+
+						teachers.append(t)
+
+			return render_template("feedback.html",questions = None,users = current,teachers = teachers,teacher=teacher,courses=courses,notifications=notifications)
 			
 		elif request.method == "POST":
 
-			return redirect(url_for('question',f_id=request.form.get("pid",),s_id=current))
+			return redirect(url_for('question',f_id=request.form.get("pid",),s_id=current,c_id=request.form.get("course",)))
 
 		
 	return redirect(url_for('login'))
 
 
 
-@app.route('/question/<f_id>/<s_id>')
-def question(f_id,s_id):
+@app.route('/question/<f_id>/<s_id>/<c_id>')
+def question(f_id,s_id,c_id):
 
 	global current
 
@@ -607,8 +637,32 @@ def question(f_id,s_id):
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
+		if questions==[]:
+			assn=None
+			theory=None
+			lab=None
+			classroom=None
+		assn=[]
+		theory=[]
+		lab=[]
+		classroom=[]
+		if questions !=[]:
+			for ques in questions:
+				if ques[1]=="Assignment and Quiz":
+					assn.append(ques)
+				elif ques[1]=="Theory Lecture":
+					theory.append(ques)
+				elif ques[1]=="Classroom Ability":
+					classroom.append(ques)
+				elif c_id[-3:-1] == "32" and ques[1]=="Lab":
+					lab.append(ques)
+
+		if c_id[-3:-1] == "32":
+			lab_occurs=True
+		else:
+			lab_occurs=None
 		conn.close()
-		return render_template("questions.html",users=users,notifications=notifications,questions=questions)
+		return render_template("questions.html",users=users,notifications=notifications,assn=assn,theory=theory,lab=lab,classroom=classroom,lab_occurs=lab_occurs)
 
 	return redirect(url_for('login'))
 
