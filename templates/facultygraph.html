@@ -18,6 +18,7 @@
     <!--     Fonts and icons     -->
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet' type='text/css'>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 
 <body>
@@ -59,18 +60,18 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{url_for('feedbackanalysis')}}">
+                        <a href="{{url_for('feedback')}}">
                             <i class="material-icons">library_books</i>
                             <p>Feedback Analysis</p>
                         </a>
                     </li>
-            <li>
+                    <li>
                         <a href="{{url_for('change_password',id=users[1])}}">
                             <i class="fa fa-key"></i>
                             <p>Change Password</p>
                         </a>
                     </li>
-            <li>
+                    <li>
                         <a href="{{url_for('notifications')}}">
                             <i class="material-icons">sms</i>
                             <p>Notifications</p>
@@ -90,32 +91,7 @@
             <div class="content">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-md-9">
-                            <div class="card">
-                                <div class="card-header" data-background-color="purple">
-                                    <h4 class="title">Course Details</h4> 
-                                    <p class="category">Courses Taught By You</p>  
-                                </div>
-                                <div class="card-content table-responsive">
-                                    <table class="table">
-                                          <tr>
-                                            <th>COURSE_CODE</th>
-                                            <th>COURSE_Name</th>
-                                            <th>Credits</th>
-                                            <th>Department</th>
-
-                                          </tr>                                      
-                                        <!--{% for item in courses %}-->
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                            </tr>
-                                        <!--{% endfor %}-->
-                                    </table>                                       
-                                </div>
-                            </div>
+                        <div class="col-md-4" id="graph" style="width:90%;height:250px;">
                         </div>
                     </div>
                 </div>
@@ -156,6 +132,15 @@
     $(document).ready(function() {
 
         // Javascript method's body can be found in static/js/demos.js
+        TESTER = document.getElementById('graph');
+        
+        Plotly.plot( TESTER, [{
+            x: {{data1|safe}},
+            y: {{data2|safe}} }], { 
+            margin: { t: 0 } } );
+
+        /* Current Plotly.js version */
+        console.log( Plotly.BUILD );
         demo.initDashboardPageCharts();
 
     });

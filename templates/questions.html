@@ -3,18 +3,18 @@
 
 <head>
      <meta charset="utf-8" />
-    <link rel="apple-touch-icon" sizes="76x76" href="../../static/img/feedback.png" />
-    <link rel="icon" type="image/png" href="../../static/img/feedback.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="../../../static/img/feedback.png" />
+    <link rel="icon" type="image/png" href="../../../static/img/feedback.png" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>Question Form</title>
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <meta name="viewport" content="width=device-width" />
     <!-- Bootstrap core CSS     -->
-    <link href="../../static/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../../../static/css/bootstrap.min.css" rel="stylesheet" />
     <!--  Material Dashboard CSS    -->
-    <link href="../../static/css/material-dashboard.css?v=1.2.0" rel="stylesheet" />
+    <link href="../../../static/css/material-dashboard.css?v=1.2.0" rel="stylesheet" />
     <!--  CSS for Demo Purpose, don't include it in your project     -->
-    <link href="../../static/css/demo.css" rel="stylesheet" />
+    <link href="../../../static/css/demo.css" rel="stylesheet" />
     <!--     Fonts and icons     -->
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet' type='text/css'>
@@ -92,100 +92,97 @@
                 <div class="container-fluid">
                     <div class="card">
                         <div class="card-header" data-background-color="purple">
-                            <h4 class="title">Questions</h4>
-                            <p class="category">Handcrafted by Admin
-                                
-                            </p>
+                            <h4 class="title">Course Feedback</h4>
                         </div>
-
+                        <form method="post" action="">
                         <div class="card-content">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <h5>Question Style</h5>
-                                    <div class="jumbotron" style="">
+                                    <h5><strong>Provide Your Feedback :</strong></h5>
+                                    <div class="jumbotron" >
                                         <span><strong><u>Theory Lecture</u>  :</strong></span><br>
                                         {% for theo in theory %}
-                    <div class="row">
-					<div class="col-md-7">
-                                            <span>{{loop.index}}. <span>
-                                            <span>{{theo[2]}}</span>
-					</div>
-					<div class="col-md-1">
-						<label class="container">One
-  						<input type="checkbox" class="group1">
-  						<span class="checkmark"></span>
-						</label>					
-					</div>
-					<div class="col-md-1">
-						<label class="container">Two
-  						<input type="checkbox" class="group1">
-  						<span class="checkmark"></span>
-						</label>					
-					</div>
-					<div class="col-md-1">
-						<label class="container">Three
-  						<input type="checkbox" class="group1">
-  						<span class="checkmark"></span>
-						</label>					
-					</div>
-					<div class="col-md-1">
-						<label class="container">Four
-  						<input type="checkbox" class="group1">
-  						<span class="checkmark"></span>
-						</label>					
-					</div>
-					<div class="col-md-1">
-						<label class="container">Five
-  						<input type="checkbox" class="group1">
-  						<span class="checkmark"></span>
-						</label>					
-					</div>
-                    
+                                        <div class="row">
+                    					<div class="col-md-7">
+                                                                <span>{{loop.index}}. <span>
+                                                                <span>{{theo[2]}}</span>
+                    					</div>
+                    					<div class="col-md-1">
+                    						<label class="container">One
+                      						<input name="{{theo[0]}}1" type="checkbox" class="group1" onchange="func({{theo[0]}},1)">
+                      						<span class="checkmark"></span>
+                    						</label>					
+                    					</div>
+                    					<div class="col-md-1">
+                    						<label class="container">Two
+                      						<input name="{{theo[0]}}2" type="checkbox" class="group1" onchange="func({{theo[0]}},2)">
+                      						<span class="checkmark"></span>
+                    						</label>					
+                    					</div>
+                    					<div class="col-md-1">
+                    						<label class="container">Three
+                      						<input name="{{theo[0]}}3" type="checkbox" class="group1" onchange="func({{theo[0]}},3)">
+                      						<span class="checkmark"></span>
+                    						</label>					
+                    					</div>
+                    					<div class="col-md-1">
+                    						<label class="container">Four
+                      						<input name="{{theo[0]}}4" type="checkbox" class="group1" onchange="func({{theo[0]}},4)">
+                      						<span class="checkmark"></span>
+                    						</label>					
+                    					</div>
+                    					<div class="col-md-1">
+                    						<label class="container">Five
+                      						<input name="{{theo[0]}}5" type="checkbox" class="group1" onchange="func({{theo[0]}},5)">
+                      						<span class="checkmark"></span>
+                    						</label>					
+                    					</div>
+                                        
 
 
-					
-					</div>
-                    {% endfor %}
+                    					
+                    					</div>
+                                        {% endfor %}
                                     </div>
                                     <div class="jumbotron" style="">
                                         <span><strong><u>Classroom Ability</u>  :</strong></span><br>
                                         {% for clas in classroom %}
-                    <div class="row">
-                    <div class="col-md-7">
-                                            <span>{{loop.index}}. <span>
-                                            <span>{{clas[2]}}</span>
-                    </div>
-                    <div class="col-md-1">
-                        <label class="container">One
-                        <input type="checkbox" class="group1">
-                        <span class="checkmark"></span>
-                        </label>                    
-                    </div>
-                    <div class="col-md-1">
-                        <label class="container">Two
-                        <input type="checkbox" class="group1">
-                        <span class="checkmark"></span>
-                        </label>                    
-                    </div>
-                    <div class="col-md-1">
-                        <label class="container">Three
-                        <input type="checkbox" class="group1">
-                        <span class="checkmark"></span>
-                        </label>                    
-                    </div>
-                    <div class="col-md-1">
-                        <label class="container">Four
-                        <input type="checkbox" class="group1">
-                        <span class="checkmark"></span>
-                        </label>                    
-                    </div>
-                    <div class="col-md-1">
-                        <label class="container">Five
-                        <input type="checkbox" class="group1">
-                        <span class="checkmark"></span>
-                        </label>                    
-                    </div>
-                    
+                                    <div class="row">
+                                    <div class="col-md-7">
+                                                            <span>{{loop.index}}. <span>
+                                                            <span>{{clas[2]}}</span>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="container">One
+                                        <input name="{{clas[0]}}1" type="checkbox" class="group1" onchange="func({{clas[0]}},1)">
+                                        <span class="checkmark"></span>
+                                        </label>                    
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="container">Two
+                                        <input name="{{clas[0]}}2" type="checkbox" class="group1" onchange="func({{clas[0]}},2)">
+                                        <span class="checkmark"></span>
+                                        </label>                    
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="container">Three
+                                        <input name="{{clas[0]}}3" type="checkbox" class="group1" onchange="func({{clas[0]}},3)">
+                                        <span class="checkmark"></span>
+                                        </label>                    
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="container">Four
+                                        <input name="{{clas[0]}}4" type="checkbox" class="group1" onchange="func({{clas[0]}},4)">
+                                        <span class="checkmark"></span>
+                                        </label>                    
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="container">Five
+                                        <input name="{{clas[0]}}5" type="checkbox" class="group1" onchange="func({{clas[0]}},5)">
+                                        <span class="checkmark"></span>
+                                        </label>                    
+                                    </div>
+                                    
 
 
                     
@@ -202,31 +199,31 @@
                     </div>
                     <div class="col-md-1">
                         <label class="container">One
-                        <input type="checkbox" class="group1">
+                        <input name="{{ass[0]}}1" type="checkbox" class="group1" onchange="func({{ass[0]}},1)">
                         <span class="checkmark"></span>
                         </label>                    
                     </div>
                     <div class="col-md-1">
                         <label class="container">Two
-                        <input type="checkbox" class="group1">
+                        <input name="{{ass[0]}}2" type="checkbox" class="group1" onchange="func({{ass[0]}},2)">
                         <span class="checkmark"></span>
                         </label>                    
                     </div>
                     <div class="col-md-1">
                         <label class="container">Three
-                        <input type="checkbox" class="group1">
+                        <input name="{{ass[0]}}3" type="checkbox" class="group1" onchange="func({{ass[0]}},3)">
                         <span class="checkmark"></span>
                         </label>                    
                     </div>
                     <div class="col-md-1">
                         <label class="container">Four
-                        <input type="checkbox" class="group1">
+                        <input name="{{ass[0]}}4" type="checkbox" class="group1" onchange="func({{ass[0]}},4)">
                         <span class="checkmark"></span>
                         </label>                    
                     </div>
                     <div class="col-md-1">
                         <label class="container">Five
-                        <input type="checkbox" class="group1">
+                        <input name="{{ass[0]}}5" type="checkbox" class="group1" onchange="func({{ass[0]}},5)">
                         <span class="checkmark"></span>
                         </label>                    
                     </div>
@@ -250,31 +247,31 @@
                     </div>
                     <div class="col-md-1">
                         <label class="container">One
-                        <input type="checkbox" class="group1">
+                        <input name="{{l[0]}}1" type="checkbox" class="group1" onchange="func({{l[0]}},1)">
                         <span class="checkmark"></span>
                         </label>                    
                     </div>
                     <div class="col-md-1">
                         <label class="container">Two
-                        <input type="checkbox" class="group1">
+                        <input name="{{l[0]}}1" type="checkbox" class="group1" onchange="func({{l[0]}},2)">
                         <span class="checkmark"></span>
                         </label>                    
                     </div>
                     <div class="col-md-1">
                         <label class="container">Three
-                        <input type="checkbox" class="group1">
+                        <input name="{{l[0]}}3" type="checkbox" class="group1" onchange="func({{l[0]}},3)">
                         <span class="checkmark"></span>
                         </label>                    
                     </div>
                     <div class="col-md-1">
                         <label class="container">Four
-                        <input type="checkbox" class="group1">
+                        <input name="{{l[0]}}4" type="checkbox" class="group1" onchange="func({{l[0]}},4)">
                         <span class="checkmark"></span>
                         </label>                    
                     </div>
                     <div class="col-md-1">
                         <label class="container">Five
-                        <input type="checkbox" class="group1">
+                        <input name="{{l[0]}}5" type="checkbox" class="group1" onchange="func({{l[0]}},5)">
                         <span class="checkmark"></span>
                         </label>                    
                     </div>
@@ -294,6 +291,7 @@
                             <br>
                         </div>
                     </div>
+                </form>
                 </div>
             </div>
             <footer class="footer">
@@ -311,23 +309,23 @@
     </div>
 </body>
 <!--   Core JS Files   -->
-<script src="../../static/js/jquery-3.2.1.min.js" type="text/javascript"></script>
-<script src="../../static/js/bootstrap.min.js" type="text/javascript"></script>
-<script src="../../static/js/material.min.js" type="text/javascript"></script>
+<script src="../../../static/js/jquery-3.2.1.min.js" type="text/javascript"></script>
+<script src="../../../static/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="../../../static/js/material.min.js" type="text/javascript"></script>
 <!--  Charts Plugin -->
-<script src="../../static/js/chartist.min.js"></script>
+<script src="../../../static/js/chartist.min.js"></script>
 <!--  Dynamic Elements plugin -->
-<script src="../../static/js/arrive.min.js"></script>
+<script src="../../../static/js/arrive.min.js"></script>
 <!--  PerfectScrollbar Library -->
-<script src="../../static/js/perfect-scrollbar.jquery.min.js"></script>
+<script src="../../../static/js/perfect-scrollbar.jquery.min.js"></script>
 <!--  Notifications Plugin    -->
-<script src="../../static/js/bootstrap-notify.js"></script>
+<script src="../../../static/js/bootstrap-notify.js"></script>
 <!--  Google Maps Plugin    -->
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
 <!-- Material Dashboard javascript methods -->
-<script src="../../static/js/material-dashboard.js?v=1.2.0"></script>
+<script src="../../../static/js/material-dashboard.js?v=1.2.0"></script>
 <!-- Material Dashboard DEMO methods, don't include it in your project! -->
-<script src="../../static/js/demo.js"></script>
+<script src="../../../static/js/demo.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
 
@@ -336,5 +334,15 @@
 
     });
 </script>
+<script type="text/javascript">
+    function func(id,no){
+        $("input[name="+id+no+"]").prop('checked',true).prop('value',true);
+        if(no!=1) $("input[name="+id+"1]").prop('checked',false).prop('value',false);
+        if(no!=2) $("input[name="+id+"2]").prop('checked',false).prop('value',false);
+        if(no!=3) $("input[name="+id+"3]").prop('checked',false).prop('value',false);
+        if(no!=4) $("input[name="+id+"4]").prop('checked',false).prop('value',false);
+        if(no!=5) $("input[name="+id+"5]").prop('checked',false).prop('value',false);
+    }
 
+</script>
 </html>

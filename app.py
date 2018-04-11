@@ -11,6 +11,7 @@ from flask_admin.contrib.sqla import ModelView
 from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy 
 from werkzeug import secure_filename
+import json
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.sqlite3'
@@ -287,10 +288,8 @@ def login():
 				return render_template("login.html",message = "Please verify your email first")
 
 			curr.execute("SELECT count(*) FROM users WHERE email = (?) and password = (?) and is_active = (?)",(username,password,1))
-			print ("pass2")
-			check = curr.fetchone()[0]
-			print (check)
-			if check != 0:
+			check = curr.fetchall()
+			if check != []:
 				message = "success"
 				print ("success")
 				user=username.split("@")[0]
@@ -441,6 +440,33 @@ def facultydashboard(id):
 		conn.close()
 		return render_template("facultydashboard.html",users=users,notifications=notifications,courses = courses)
 	return redirect(url_for('login'))
+
+
+@app.route('/feedbackanalysis')
+def feedbackanalysis():
+	global current
+	if session.get('logged_in') :
+		conn = sqlite3.connect('students.sqlite3')
+		cur = conn.cursor()
+		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+		users = cur.fetchone()
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
+		notifications = cur.fetchall()
+		if notifications==[]:
+			notifications=None
+
+		cur.execute('SELECT course_code FROM users_courses WHERE useremail = (?)',(current+"@iiita.ac.in",))
+		data = cur.fetchall()
+		data1=[]
+		for d in data:
+			data1.append(d[0])
+
+		
+		
+
+		return render_template('facultygraph.html',users=users,notifications=notifications,data1=json.dumps(data1),data2=json.dumps(data2))
+	else:
+		return redirect(url_for('login'))
 
 
 @app.route('/profile/<id>',methods = ['GET','POST'])
@@ -621,7 +647,7 @@ def feedback():
 
 
 
-@app.route('/question/<f_id>/<s_id>/<c_id>')
+@app.route('/question/<f_id>/<s_id>/<c_id>',methods = ['GET','POST'])
 def question(f_id,s_id,c_id):
 
 	global current
@@ -661,6 +687,25 @@ def question(f_id,s_id,c_id):
 			lab_occurs=True
 		else:
 			lab_occurs=None
+
+		if request.method=="POST":
+			for q in questions:
+				if request.form.get(str(q[0])+"1",):
+					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating) values (?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",1,));
+					conn.commit()
+				elif request.form.get(str(q[0])+"2",):
+					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating) values (?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",2,));
+					conn.commit()
+				elif request.form.get(str(q[0])+"3",):
+					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating) values (?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",3,));
+					conn.commit()
+				elif request.form.get(str(q[0])+"4",):
+					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating) values (?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",4,));
+					conn.commit()
+				elif request.form.get(str(q[0])+"5",):
+					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating) values (?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",5,));
+					conn.commit()
+			return redirect(url_for('feedback'))
 		conn.close()
 		return render_template("questions.html",users=users,notifications=notifications,assn=assn,theory=theory,lab=lab,classroom=classroom,lab_occurs=lab_occurs)
 
