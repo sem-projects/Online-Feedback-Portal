@@ -446,7 +446,7 @@ def facultydashboard(id):
 	return redirect(url_for('login'))
 
 
-@app.route('/feedbackanalysis')
+@app.route('/feedbackanalysis',methods=['GET','POST'])
 def feedbackanalysis():
 	global current
 	if session.get('logged_in') :
@@ -456,19 +456,55 @@ def feedbackanalysis():
 		users = cur.fetchone()
 		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
 		notifications = cur.fetchall()
+		cur.execute("SELECT * FROM users_courses where useremail = (?)",(current+"@iiita.ac.in",))
+		subject = cur.fetchall()
+		if subject==[]:
+			subject=None
+		
+		sub=None
+		message=None
+		select_subject=None
+		types = ['Overall','Theory']
+		data1=None
+		data2=None
+		graph=None
+		if request.method=="GET":
+			sub = request.args.get('sub')
+
+			cur.execute("SELECT * FROM courses where course_code = (?)",(sub,))
+			if cur.fetchall()!=[]:
+				cur.execute("SELECT * FROM users_courses where useremail = (?)",(current+"@iiita.ac.in",))
+				if cur.fetchall()==[]:
+					message = "Don't use foul means :p"
+				else:
+					if sub[-2:-1]!='0':
+						types.append('Lab')
+					select_subject=sub
+			else:
+				message = "Don't use foul means :p"
+
+		if request.method=="POST":
+			if request.form.get('type1',)=="Overall":
+				cur.execute('SELECT avg(rating) as average, strftime((?), date1) as year FROM rating WHERE faculty_email = (?) and course_code=(?) group by year',('%Y',current+"@iiita.ac.in",request.form.get('sub'),))
+			elif request.form.get('type1',)=="Lab":
+				cur.execute('SELECT avg(rating) as average,strftime((?), date1) as year FROM rating INNER JOIN questions ON rating.question_id=questions.S_no WHERE faculty_email = (?) and course_code=(?) and question_type=(?) group by year',('%Y',current+"@iiita.ac.in",sub,'Lab',))
+			elif request.form.get('type1',)=="Theory":
+				cur.execute('SELECT avg(rating) as average,strftime((?), date1) as year FROM rating INNER JOIN questions ON rating.question_id=questions.S_no WHERE faculty_email = (?) and course_code=(?) and question_type!=(?) group by year',('%Y',current+"@iiita.ac.in",sub,'Lab',))
+
+			data = cur.fetchall()
+			print(data)
+			data1=[]
+			data2=[]
+			graph=True
+			for d in data:
+				data2.append(d[0])
+				data1.append(d[1])
+
 		if notifications==[]:
 			notifications=None
 
-		cur.execute('SELECT course_code FROM users_courses WHERE useremail = (?)',(current+"@iiita.ac.in",))
-		data = cur.fetchall()
-		data1=[]
-		for d in data:
-			data1.append(d[0])
 
-		
-		
-
-		return render_template('facultygraph.html',users=users,notifications=notifications,data1=json.dumps(data1),data2=json.dumps(data2))
+		return render_template('facultygraph.html',users=users,graph=graph,notifications=notifications,data1=json.dumps(data1),data2=json.dumps(data2),types=types,subject=subject,select_subject=select_subject,message=message)
 	else:
 		return redirect(url_for('login'))
 
