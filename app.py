@@ -1,5 +1,6 @@
 from flask import Flask,render_template,redirect, url_for, request
 import sqlite3
+from datetime import datetime, date
 from functools import wraps
 from flask import Flask,render_template,redirect, url_for,request,session,flash
 import os
@@ -87,13 +88,13 @@ class rating(db.Model):
 	faculty_email = db.Column(db.String(50),db.ForeignKey('users.email'))  
 	student_email = db.Column(db.String(50),db.ForeignKey('users.email'))
 	rating = db.Column(db.Integer)
-
+	date1 = db.Column(db.Date())
 
 class MyRatingView(ModelView):
 	column_display_pk = True
 	can_create = True
-	column_list = ('r_id', 'course_code','question_id','faculty_email','student_email','rating')
-	form_columns = ['r_id', 'course_code','question_id','faculty_email','student_email','rating']
+	column_list = ('r_id', 'course_code','question_id','faculty_email','student_email','rating','date1')
+	form_columns = ['r_id', 'course_code','question_id','faculty_email','student_email','rating','date1']
 
 class MyCourseView(ModelView):
 	column_display_pk = True
@@ -125,6 +126,10 @@ class MyQuestionView(ModelView):
 	column_list = ('S_no','question_type','question')
 	form_columns = ['S_no','question_type','question']	
 
+'''conn = sqlite3.connect('students.sqlite3')
+cur = conn.cursor()
+cur.execute("DROP TABLE rating")
+conn.commit()'''
 
 db.create_all()
 admin = Admin(app)
@@ -242,7 +247,6 @@ sqliteAdminBP = sqliteAdminBlueprint(
   decorator = do_admin_login
 )	
 app.register_blueprint(sqliteAdminBP, url_prefix='/admin')'''
-
 
 
 current = None
@@ -703,7 +707,7 @@ def question(f_id,s_id,c_id):
 					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating) values (?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",4,));
 					conn.commit()
 				elif request.form.get(str(q[0])+"5",):
-					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating) values (?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",5,));
+					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating,date1) values (?,?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",5,date.today(),));
 					conn.commit()
 			return redirect(url_for('feedback'))
 		conn.close()
