@@ -36,7 +36,7 @@
             <div class="sidebar-wrapper">
                 <ul class="nav">
                      <li>
-                        <a href="{{url_for('dashboard',id=users[1])}}">
+                        <a href="{{url_for('login')}}">
                             <i class="material-icons">dashboard</i>
                             <p>Dashboard</p>
                         </a>
@@ -59,12 +59,21 @@
                             <p>Query</p>
                         </a>
                     </li>
+                    {% if type1 in "Student" %}
                     <li>
                         <a href="{{url_for('feedback')}}">
                             <i class="material-icons">library_books</i>
                             <p>Feedback</p>
                         </a>
                     </li>
+                    {% else %}
+                        <li>
+                        <a href="{{url_for('feedbackanalysis')}}">
+                            <i class="material-icons">library_books</i>
+                            <p>Feedback Analysis</p>
+                        </a>
+                        </li>
+                    {% endif %}
             <li>
                         <a href="{{url_for('change_password',id=users[1])}}">
                             <i class="fa fa-key"></i>

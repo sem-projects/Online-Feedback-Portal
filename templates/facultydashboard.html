@@ -35,7 +35,7 @@
             <div class="sidebar-wrapper">
                 <ul class="nav">
                      <li class="active">
-                        <a href="facultydashboard.html,id=users[1])}}">
+                        <a href="{{url_for('facultydashboard',id=users[1])}}">
                             <i class="material-icons">dashboard</i>
                             <p>Dashboard</p>
                         </a>
@@ -106,12 +106,14 @@
 
                                           </tr>                                      
                                         <!--{% for item in courses %}-->
+                                            {% for item in courses %}
                                             <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
+                                                <td>{{item[0]}}</td>
+                                                <td>{{item[1]}}</td>
+                                                <td>{{item[2]}}</td>
+                                                <td>{{item[3]}}</td>
                                             </tr>
+                                            {% endfor %}
                                         <!--{% endfor %}-->
                                     </table>                                       
                                 </div>

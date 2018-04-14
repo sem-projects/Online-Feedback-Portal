@@ -256,23 +256,31 @@ app.register_blueprint(sqliteAdminBP, url_prefix='/admin')'''
 
 
 current = None
-   
+type1 = ""
+
 
 @app.route('/')
 def index():
    return render_template("index.html")
 
 
-
-
 @app.route('/login',methods = ['GET','POST'])
 def login():
 	message = None
-	global current
+	global current,type1
 	if session.get('logged_in'):
-		return redirect(url_for('dashboard',id = current))
+		conn = sqlite3.connect('students.sqlite3')
+		print ("Opened database successfully")
+		curr = conn.cursor()
+		curr.execute('SELECT type1 FROM users where email = (?)',(current+"@iiita.ac.in",))
+		if curr.fetchone()[0]=="Student":
+			return redirect(url_for('dashboard',id = current))
+		if curr.fetchone()[0]=="Faculty":
+			return redirect(url_for('facultydashboard',id = current))
+
 	if request.method == 'GET':
-		return render_template("login.html",message = None	)
+		return render_template("login.html",message = None)
+		
 	if request.method == 'POST':
 		username=request.form.get('username',)
 		password=request.form.get('pass',)
@@ -305,12 +313,15 @@ def login():
 				user=username.split("@")[0]
 				session['logged_in'] = True
 				current = user
+
 				curr.execute("SELECT type1 FROM users WHERE email = (?)",(username,))
 				user_type=curr.fetchone()[0]
 				conn.close()
 				if user_type == "Student" :
+					type1="Student"
 					return redirect(url_for('dashboard',id=user))
 				elif user_type == "Faculty" :
+					type1 = "Faculty"
 					return redirect(url_for('facultydashboard',id=user))
 			else:
 				return render_template("login.html",message = "INCORRECT PASSWORD")	
@@ -403,9 +414,10 @@ def admin_question_add():
 	return render_template("admin_question_add.html")
 
 
+
 @app.route('/dashboard/<id>')
 def dashboard(id):
-	global current
+	global current,type1
 	if session.get('logged_in') and id == current:
 		conn = sqlite3.connect('students.sqlite3')
 		cur = conn.cursor()
@@ -417,12 +429,12 @@ def dashboard(id):
 		print (users)
 		print (courses)
 		cur = conn.cursor()
-		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?) and reply_to_query != (?)",(id+"@iiita.ac.in",0,None,))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
 		conn.close()
-		return render_template("dashboard.html",users=users,notifications=notifications,courses = courses)
+		return render_template("dashboard.html",type1=type1,users=users,notifications=notifications,courses = courses)
 	return redirect(url_for('login'))
 
 
@@ -430,7 +442,7 @@ def dashboard(id):
 
 @app.route('/facultydashboard/<id>')
 def facultydashboard(id):
-	global current
+	global current,type1
 
 	if session.get('logged_in') and id == current:
 		conn = sqlite3.connect('students.sqlite3')
@@ -448,13 +460,13 @@ def facultydashboard(id):
 		if notifications==[]:
 			notifications=None
 		conn.close()
-		return render_template("facultydashboard.html",users=users,notifications=notifications,courses = courses)
+		return render_template("facultydashboard.html",type1=type1,users=users,notifications=notifications,courses = courses)
 	return redirect(url_for('login'))
 
 
 @app.route('/feedbackanalysis',methods=['GET','POST'])
 def feedbackanalysis():
-	global current
+	global current,type1
 	if session.get('logged_in') :
 		conn = sqlite3.connect('students.sqlite3')
 		cur = conn.cursor()
@@ -510,14 +522,14 @@ def feedbackanalysis():
 			notifications=None
 
 
-		return render_template('facultygraph.html',users=users,graph=graph,notifications=notifications,data1=json.dumps(data1),data2=json.dumps(data2),types=types,subject=subject,select_subject=select_subject,message=message)
+		return render_template('facultygraph.html',type1=type1,users=users,graph=graph,notifications=notifications,data1=json.dumps(data1),data2=json.dumps(data2),types=types,subject=subject,select_subject=select_subject,message=message)
 	else:
 		return redirect(url_for('login'))
 
 
 @app.route('/profile/<id>',methods = ['GET','POST'])
 def profile(id=None):
-	global current
+	global current,type1
 	message=None
 	img=None
 	if session.get('logged_in') :
@@ -531,7 +543,8 @@ def profile(id=None):
 			if notifications==[]:
 				notifications=None
 			conn.close()
-			return render_template("user.html",users=users,notifications=notifications,message=message)
+			print(type1)
+			return render_template("user.html",type1=type1,users=users,notifications=notifications,message=message)
 	
 		if request.method == 'POST':
 			conn = sqlite3.connect('students.sqlite3')
@@ -550,7 +563,7 @@ def profile(id=None):
 			file = request.files['file']
 			if file.filename == '':
 				flash('No selected file')
-				return redirect(url_for('profile',id=current,notifications=notifications,message=message))
+				return redirect(url_for('profile',id=current))
 			if file:
 				filename = secure_filename(file.filename)
 				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -560,13 +573,13 @@ def profile(id=None):
 			cur.execute("UPDATE users SET name = (?) , dob = (?) , semester = (?) , department = (?), image_link = (?) WHERE username = (?)",(nm,dob,sem,depart,img,current,))
 			conn.commit()
 			conn.close()
-			return render_template("user.html",users=users,notifications=notifications,message=message)
+			return render_template("user.html",type1=type1,users=users,notifications=notifications,message=message)
 	
 	return redirect(url_for('login'))
 
 @app.route('/courses',methods = ['GET','POST'])
 def courses():
-	global current
+	global current,type1
 	course = None 
 	if session.get('logged_in'):
 		conn = sqlite3.connect('students.sqlite3')
@@ -600,7 +613,7 @@ def courses():
 		users_cour = cur.fetchall()
 		if users_cour != []:
 			exist = True
-		return render_template("courses.html",users=users,courses=course,exist=exist,notifications=notifications)
+		return render_template("courses.html",type1=type1,users=users,courses=course,exist=exist,notifications=notifications)
 	return redirect(url_for('login'))
 
 
@@ -608,7 +621,7 @@ def courses():
 
 @app.route('/query',methods = ['GET','POST'])
 def query():
-	global current
+	global current,type1
 	if session.get('logged_in'):
 		if request.method == 'GET':
 			conn = sqlite3.connect('students.sqlite3')
@@ -616,7 +629,7 @@ def query():
 			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 			users = cur.fetchone()
 			conn.close()
-			return render_template("query.html",users=users,message = None)
+			return render_template("query.html",type1=type1,users=users,message = None)
 		if request.method == 'POST':
 			conn = sqlite3.connect('students.sqlite3')
 			cur = conn.cursor()
@@ -630,14 +643,14 @@ def query():
 			conn.commit()
 			print ("query updated")
 			conn.close()
-			return render_template("query.html",users=users,message = "Query updated successfully")
+			return render_template("query.html",type1=type1,users=users,message = "Query updated successfully")
 
 	return redirect(url_for('login'))
 
 
 @app.route('/feedback', methods = ['GET','POST'])
 def feedback():
-	global current
+	global current,type1
 	if session.get('logged_in'):
 		conn = sqlite3.connect('students.sqlite3')
 		cur = conn.cursor()
@@ -682,7 +695,7 @@ def feedback():
 
 						teachers.append(t)
 
-			return render_template("feedback.html",questions = None,users = current,teachers = teachers,teacher=teacher,courses=courses,notifications=notifications)
+			return render_template("feedback.html",type1=type1,questions = None,users = current,teachers = teachers,teacher=teacher,courses=courses,notifications=notifications)
 			
 		elif request.method == "POST":
 
@@ -696,7 +709,7 @@ def feedback():
 @app.route('/question/<f_id>/<s_id>/<c_id>',methods = ['GET','POST'])
 def question(f_id,s_id,c_id):
 
-	global current
+	global current,type1
 
 	if session.get('logged_in'):
 		conn = sqlite3.connect('students.sqlite3')
@@ -753,7 +766,7 @@ def question(f_id,s_id,c_id):
 					conn.commit()
 			return redirect(url_for('feedback'))
 		conn.close()
-		return render_template("questions.html",users=users,notifications=notifications,assn=assn,theory=theory,lab=lab,classroom=classroom,lab_occurs=lab_occurs)
+		return render_template("questions.html",type1=type1,users=users,notifications=notifications,assn=assn,theory=theory,lab=lab,classroom=classroom,lab_occurs=lab_occurs)
 
 	return redirect(url_for('login'))
 
@@ -762,7 +775,7 @@ def question(f_id,s_id,c_id):
 
 @app.route('/change_password/<id>',methods = ['GET','POST'])
 def change_password(id):
-	global current
+	global current,type1
 	message = None
 	if session.get('logged_in'):
 		if request.method == 'GET':
@@ -775,7 +788,7 @@ def change_password(id):
 			if notifications==[]:
 				notifications=None
 			conn.close()
-			return render_template("changepwd.html",users=users,notifications=notifications,message=message)
+			return render_template("changepwd.html",type1=type1,users=users,notifications=notifications,message=message)
 		if request.method=="POST":
 			conn = sqlite3.connect('students.sqlite3')
 			cur = conn.cursor()
@@ -793,16 +806,16 @@ def change_password(id):
 			print (old1,currpass[0])
 			if old1 != currpass[0]:
 				message = "Wrong password"
-				return render_template("changepwd.html",users=users,notifications=notifications,message=message)
+				return render_template("changepwd.html",type1=type1,users=users,notifications=notifications,message=message)
 			elif new1!=new2:
 				message = "password doesn't match"
-				return render_template("changepwd.html",users=users,notifications=notifications,message=message)
+				return render_template("changepwd.html",type1=type1,users=users,notifications=notifications,message=message)
 			else:
 				message = "password changed successfully"
 				cur.execute("UPDATE users set password = (?) where username = (?)",(new1,current,))
 				conn.commit()
 				conn.close()
-				return render_template("changepwd.html",users=users,notifications=notifications,message=message)
+				return render_template("changepwd.html",type1=type1,users=users,notifications=notifications,message=message)
 			
 
 	return redirect(url_for('login'))
@@ -810,15 +823,15 @@ def change_password(id):
 
 @app.route('/notifications')
 def notifications():
-	global current
+	global current,type1
 	if session.get('logged_in'):
 		conn = sqlite3.connect('students.sqlite3')
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
-		cur.execute("SELECT S_no,query,reply_to_query FROM query WHERE useremail = (?) and seen != (?)",(current+"@iiita.ac.in",1,))
+		cur.execute("SELECT S_no,query,reply_to_query FROM query WHERE useremail = (?) and seen != (?) and reply_to_query != (?)",(current+"@iiita.ac.in",1,None,))
 		queries_ans = cur.fetchall()
-		return render_template("notifications.html",users=users,queries_ans=queries_ans)
+		return render_template("notifications.html",type1=type1,users=users,queries_ans=queries_ans)
 
 	return redirect(url_for('login'))
 @app.route('/closenotify/<c_id>')
@@ -839,8 +852,11 @@ def closenotify(c_id):
 
 @app.route('/logout')
 def logout():
+	global current,type1
 	if session.get('logged_in'):
 		session['logged_in']=False
+		current = None
+		type1 = ""
 
 	return redirect(url_for('login'))
 
