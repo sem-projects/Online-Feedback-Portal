@@ -95,36 +95,42 @@ class MyRatingView(ModelView):
 	can_create = True
 	column_list = ('r_id', 'course_code','question_id','faculty_email','student_email','rating','date1')
 	form_columns = ['r_id', 'course_code','question_id','faculty_email','student_email','rating','date1']
+	column_filters = ['r_id', 'course_code','question_id','faculty_email','student_email','rating','date1']
 
 class MyCourseView(ModelView):
 	column_display_pk = True
 	can_create = True
 	column_list = ('course_code', 'course_name', 'credits','semester','department')
 	form_columns = ['course_code', 'course_name', 'credits','semester','department']
+	column_filters = ['course_code', 'course_name', 'credits','semester','department']
 
 class MyUserView(ModelView):
 	column_display_pk = True
 	can_create = True
 	column_list = ('email','username','name','dob','password','type1','semester','department','is_active','secret_key','image_link')
 	form_columns = ['email','username','name','dob','password','type1','semester','department','is_active','secret_key','image_link']
+	column_filters = ['email','username','name','dob','password','type1','semester','department','is_active','secret_key','image_link']
 
 class MyUserCoursesView(ModelView):
 	column_display_pk = True
 	can_create = True
 	column_list = ('S_no','useremail', 'course_code')
 	form_columns = ['S_no','useremail', 'course_code']
+	column_filters = ['S_no','useremail', 'course_code']
 
 class MyQueryView(ModelView):
 	column_display_pk = True
 	can_create = True
 	column_list = ('S_no','useremail','query','reply_to_query','seen')
 	form_columns = ['S_no','useremail','query','reply_to_query','seen']
+	column_filters = ['S_no','useremail','query','reply_to_query','seen']
 
 class MyQuestionView(ModelView):
 	column_display_pk = True
 	can_create = True
 	column_list = ('S_no','question_type','question')
-	form_columns = ['S_no','question_type','question']	
+	form_columns = ['S_no','question_type','question']
+	column_filters = ['S_no','question_type','question']
 
 '''conn = sqlite3.connect('students.sqlite3')
 cur = conn.cursor()
