@@ -468,6 +468,7 @@ def feedbackanalysis():
 	if session.get('logged_in') :
 		conn = sqlite3.connect('students.sqlite3')
 		cur = conn.cursor()
+		cur2 = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
 		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
@@ -484,6 +485,7 @@ def feedbackanalysis():
 		data1=None
 		data2=None
 		graph=None
+		year1=None
 		if request.method=="GET":
 			sub = request.args.get('sub')
 
@@ -498,29 +500,37 @@ def feedbackanalysis():
 					select_subject=sub
 			else:
 				message = "Don't use foul means :p"
-
+		year = None
 		if request.method=="POST":
 			if request.form.get('type1',)=="Overall":
 				cur.execute('SELECT avg(rating) as average, strftime((?), date1) as year FROM rating WHERE faculty_email = (?) and course_code=(?) group by year',('%Y',current+"@iiita.ac.in",request.form.get('sub'),))
+				cur2.execute('SELECT strftime((?), date1) as year FROM rating WHERE faculty_email = (?) and course_code=(?) group by year',('%Y',current+"@iiita.ac.in",request.form.get('sub'),))	
 			elif request.form.get('type1',)=="Lab":
+				cur2.execute('SELECT strftime((?), date1) as year FROM rating INNER JOIN questions ON rating.question_id=questions.S_no WHERE faculty_email = (?) and course_code=(?) and question_type=(?) group by year',('%Y',current+"@iiita.ac.in",sub,'Lab',))
 				cur.execute('SELECT avg(rating) as average,strftime((?), date1) as year FROM rating INNER JOIN questions ON rating.question_id=questions.S_no WHERE faculty_email = (?) and course_code=(?) and question_type=(?) group by year',('%Y',current+"@iiita.ac.in",sub,'Lab',))
 			elif request.form.get('type1',)=="Theory":
 				cur.execute('SELECT avg(rating) as average,strftime((?), date1) as year FROM rating INNER JOIN questions ON rating.question_id=questions.S_no WHERE faculty_email = (?) and course_code=(?) and question_type!=(?) group by year',('%Y',current+"@iiita.ac.in",sub,'Lab',))
-
+				cur2.execute('SELECT strftime((?), date1) as year FROM rating INNER JOIN questions ON rating.question_id=questions.S_no WHERE faculty_email = (?) and course_code=(?) and question_type!=(?) group by year',('%Y',current+"@iiita.ac.in",sub,'Lab',))
 			data = cur.fetchall()
+			year = cur2.fetchall()
 			print(data)
 			data1=[]
 			data2=[]
 			graph=True
+			year1=[]
+			temp = request.form.get('year1',)
+			print temp,'======='
 			for d in data:
 				data2.append(d[0])
 				data1.append(d[1])
-
+			for y in year:
+				year1.append(y[0])
+         
 		if notifications==[]:
 			notifications=None
 
 
-		return render_template('facultygraph.html',type1=type1,users=users,graph=graph,notifications=notifications,data1=json.dumps(data1),data2=json.dumps(data2),types=types,subject=subject,select_subject=select_subject,message=message)
+		return render_template('facultygraph.html',year = year1,type1=type1,users=users,graph=graph,notifications=notifications,data1=json.dumps(data1),data2=json.dumps(data2),types=types,subject=subject,select_subject=select_subject,message=message)
 	else:
 		return redirect(url_for('login'))
 

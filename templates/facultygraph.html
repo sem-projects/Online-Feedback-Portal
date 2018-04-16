@@ -102,7 +102,7 @@
                                          <div class="row">
                                               <div class="col-md-4" style="padding: 20px;text-align: center;font-size: 20px;">Choose Subject  :</div>
                                               <div class="col-md-4">
-                                                  <select name="sub" onchange="window.location.href='http://127.0.0.1:5000/feedbackanalysis?sub='+this.value" style="margin-top: 10px;height: 30px;width: 250px;">
+                                                  <select name="sub" onchange="window.location.href='http://127.0.0.1:5000/feedbackanalysis?sub='+this.value" style="margin-top: 10px;height: 10px;width: 250px;">
                                                         {% if select_subject is none %}<option value="None">Select</option>{% endif %}
                                                         {% for item in subject %}
                                                                         {% if select_subject is not none and select_subject in item[2] %}
@@ -117,8 +117,7 @@
                                                       </select>
                                                 </div>
                                           </div>  
-                          <br>
-                          <br>
+                     
                           <br>
                           <div class="row">
                             <div class="col-md-4" style="padding: 10px;text-align: center;font-size: 20px;">Filter :</div> 
@@ -148,7 +147,25 @@
                                  </div>
                             </div>
                         </div>
-                        {% endif %}
+                         {% endif %}
+                        <form method="POST" action="">
+                                         <div class="row">
+                                            <div class="col-md-4" style="padding: 10px;text-align: center;font-size: 20px;">Select Year :</div> 
+                                                  <div class="col-md-4"> 
+                                                     <select name="year1" style="margin-top: 0px;height: 30px;width: 250px;">
+                                                        {% if year is not none %}
+                                                             {% for item in year %}
+                                                                <option value="{{item}}">{{item}}</option>
+                                                             {% endfor %}
+                                                        {% else %}
+                                                             <option value="">Choose Year first</option>
+                                                        {% endif %}
+                                                     </select>
+                                                 </div>
+                                           </div>
+                                          <center><button type="submit" class="btn btn-primary ">Apply Filter</button></center>
+                            </form>
+                       
                         
                                 
                             </div>
