@@ -88,14 +88,15 @@
             </div>
         </div>
         <div class="main-panel">
-            {% if graph is not none %}<div class="content">
+            <div class="content">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-md-4" id="graph" style="width:90%;height:400px;">
-                        </div>
-                    </div>
-                </div>
-            </div>{% endif %}
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header" data-background-color="purple">
+                                    <h4 class="title">Analyze your Feedback</h4>
+                                    <p class="category">Check the feedback given to you!!</p>
+                                </div>
             <div class="card-content">
                                      <form method="POST" action="">
                                          <div class="row">
@@ -135,13 +136,28 @@
                            </div>
                           <br>
                           <br>
-                          <center><button type="submit" class="btn btn-primary ">Give Feedback</button></center>
+                          <center><button type="submit" class="btn btn-primary ">Check Your Feedback</button></center>
                         </form>
-                        
+                         {% if graph is not none %}
+                         <div class="content">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-md-4" id="graph" style="width:90%;height:400px;">
+                                    </div>
+                                 </div>
+                            </div>
+                        </div>
+                        {% endif %}
                         
             
                                 
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
             <footer class="footer">
                 <div class="container-fluid">
                     <p class="copyright pull-right">
@@ -179,11 +195,29 @@
 
         // Javascript method's body can be found in static/js/demos.js
         TESTER = document.getElementById('graph');
-        
+        var layout = {
+          title: 'Rating Graph',
+          xaxis: {
+            title: 'Year',
+            titlefont: {
+              family: 'Courier New, monospace',
+              size: 18,
+              color: '#7f7f7f'
+            }
+          },
+          yaxis: {
+            title: 'Rating',
+            titlefont: {
+              family: 'Courier New, monospace',
+              size: 18,
+              color: '#7f7f7f'
+            }
+          }
+        };
         Plotly.plot( TESTER, [{
             x: {{data1|safe}},
-            y: {{data2|safe}} }], { 
-            margin: { t: 0 } } );
+            y: {{data2|safe}} }],layout);
+
 
         /* Current Plotly.js version */
         console.log( Plotly.BUILD );

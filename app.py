@@ -748,16 +748,16 @@ def question(f_id,s_id,c_id):
 		if request.method=="POST":
 			for q in questions:
 				if request.form.get(str(q[0])+"1",):
-					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating,date1) values (?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",1,date.today(),));
+					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating,date1) values (?,?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",1,date.today(),));
 					conn.commit()
 				elif request.form.get(str(q[0])+"2",):
-					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating,date1) values (?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",2,date.today(),));
+					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating,date1) values (?,?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",2,date.today(),));
 					conn.commit()
 				elif request.form.get(str(q[0])+"3",):
-					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating,date1) values (?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",3,date.today(),));
+					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating,date1) values (?,?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",3,date.today(),));
 					conn.commit()
 				elif request.form.get(str(q[0])+"4",):
-					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating,date1) values (?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",4,date.today(),));
+					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating,date1) values (?,?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",4,date.today(),));
 					conn.commit()
 				elif request.form.get(str(q[0])+"5",):
 					cur.execute('INSERT into rating (course_code,question_id,faculty_email,student_email,rating,date1) values (?,?,?,?,?,?)',(c_id,q[0],f_id+"@iiita.ac.in",s_id+"@iiita.ac.in",5,date.today(),));

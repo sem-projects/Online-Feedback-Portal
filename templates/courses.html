@@ -92,7 +92,7 @@
 </style>
 <body>
     <div class="wrapper">
-        <div class="sidebar" data-color="purple" data-image="../static/img/sidebar-1.jpg">
+        <div class="sidebar" data-color="purple" data-image="../static/img/sidebar-1.jpg" style="background-color: #fff">
             <!--
         Tip 1: You can change the color of the sidebar using: data-color="purple | blue | green | orange | red"
 
@@ -121,7 +121,7 @@
                             <p>User Profile</p>
                         </a>
                     </li>
-                    <li>
+                    <li class="active">
                         <a href="{{url_for('courses')}}">
                             <i class="material-icons">library_books</i>
                             <p>Select Courses</p>
@@ -148,7 +148,7 @@
                         </a>
                         </li>
                     {% endif %}
-            <li>
+                    <li>
                         <a href="{{url_for('change_password',id=users[1])}}">
                             <i class="fa fa-key"></i>
                             <p>Change Password</p>
