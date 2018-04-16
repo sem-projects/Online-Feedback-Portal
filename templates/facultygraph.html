@@ -138,9 +138,10 @@
                           <br>
                           <center><button type="submit" class="btn btn-primary ">Check Your Feedback</button></center>
                         </form>
+                        <br>
                          {% if graph is not none %}
                          <div class="content">
-                            <div class="container-fluid">
+                            <div class="container-fluid" style="border-color: #000;border-width: 2px;">
                                 <div class="row">
                                     <div class="col-md-4" id="graph" style="width:90%;height:400px;">
                                     </div>
@@ -149,7 +150,6 @@
                         </div>
                         {% endif %}
                         
-            
                                 
                             </div>
                         </div>
@@ -203,7 +203,15 @@
               family: 'Courier New, monospace',
               size: 18,
               color: '#7f7f7f'
-            }
+            },
+            range:[2014,2020],
+            rangemode: 'nonnegative',
+            zeroline: true,
+            showline: true,
+            zerolinecolor: '#969696',
+            zerolinewidth: 4,
+            linecolor: '#636363',
+            linewidth: 6
           },
           yaxis: {
             title: 'Rating',
@@ -211,7 +219,15 @@
               family: 'Courier New, monospace',
               size: 18,
               color: '#7f7f7f'
-            }
+            },
+            range:[0,5.1],
+            rangemode: 'nonnegative',
+            zeroline: true,
+            showline: true,
+            zerolinecolor: '#969696',
+            zerolinewidth: 4,
+            linecolor: '#636363',
+            linewidth: 6
           }
         };
         Plotly.plot( TESTER, [{

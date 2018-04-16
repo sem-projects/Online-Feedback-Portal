@@ -637,7 +637,7 @@ def query():
 			qu = request.form.get('query',)
 			print (qu)
 			cur.execute("INSERT INTO query (useremail,query,reply_to_query,seen) values (?,?,?,?)",\
-				(current+"@iiita.ac.in",qu,None,0,))
+				(current+"@iiita.ac.in",qu,'None',0,))
 			conn.commit()
 			print ("query updated")
 			conn.close()
@@ -827,7 +827,7 @@ def notifications():
 		cur = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
-		cur.execute("SELECT S_no,query,reply_to_query FROM query WHERE useremail = (?) and seen != (?) and reply_to_query != (?)",(current+"@iiita.ac.in",1,None,))
+		cur.execute("SELECT S_no,query,reply_to_query FROM query WHERE useremail = (?) and seen != (?) and reply_to_query != (?)",(current+"@iiita.ac.in",1,'None',))
 		queries_ans = cur.fetchall()
 		return render_template("notifications.html",type1=type1,users=users,queries_ans=queries_ans)
 
