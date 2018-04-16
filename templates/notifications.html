@@ -30,7 +30,11 @@
     -->
             <div class="logo">
                    <label class="simple-text">
+                    {% if type1 in "Student" %}
                     STUDENT AREA
+                   {% else %}
+                    FACULTY AREA
+                   {% endif %}
                 </label>
             </div>
             <div class="sidebar-wrapper">

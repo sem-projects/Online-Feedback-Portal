@@ -7,7 +7,7 @@ import os
 import random
 from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
-from flask_admin import Admin
+from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy 
@@ -136,9 +136,34 @@ class MyQuestionView(ModelView):
 cur = conn.cursor()
 cur.execute("DROP TABLE rating")
 conn.commit()'''
+adminlog = False
+@app.route('/adminlogin', methods=['GET','POST'])
+def adminlogin():
+	print "hi"
+	global adminlog
+	if request.method == 'GET':
+		return render_template('adminlogin.html')
+	if request.method == 'POST':
+	    if request.form['password'] == 'password' and request.form['username'] == 'admin':
+	        adminlog = True
+	        print "auth done.................................."
+	        return redirect('http://127.0.0.1:5000/admin')				####change to host
+	    else:
+	        flash('wrong password!')
+	
+
+class MyAdminIndexView(AdminIndexView):
+	def is_accessible(self):
+		global adminlog
+		if adminlog==False:
+			return False
+		if adminlog==True:
+			adminlog=False
+			return True
+
 
 db.create_all()
-admin = Admin(app)
+admin = Admin(app,index_view=MyAdminIndexView())
 admin.add_view(MyCourseView(courses,db.session))
 admin.add_view(MyUserView(users,db.session))
 admin.add_view(MyUserCoursesView(users_courses,db.session))
@@ -215,37 +240,8 @@ print (al)
 conn.close()'''
 
 
-'''@app.route('/adminlogin', methods=['POST'])
-def admin_login():
-    if request.form['password'] == 'password' and request.form['username'] == 'admin':
-        session['admin_logged_in'] = True
-        print "auth done.................................."
-        return redirect('http://127.0.0.1:5000/admin')				####change to host
-    else:
-        flash('wrong password!')
 
-
-def check_validity(func):
-	@wraps(func)
-	def decorated_function(*args, **kwargs):
-		if request.referrer != "http://127.0.0.1:5000/login" and request.referrer != "http://localhost:5000/login":
-			print ("dont be smart")
-			return redirect(url_for('login'))
-		return func(*args, **kwargs)
-
-	return decorated_function
-
-def do_admin_login(func):
-	@wraps(func)
-	def decorated_function(*args, **kwargs):
-		if not session.get('admin_logged_in'):
-			print "decorater called..........................."
-			return render_template('adminlogin.html')
-		#session['admin_logged_in'] = False
-		return func(*args, **kwargs)
-
-	return decorated_function
-
+'''
 
 
 sqliteAdminBP = sqliteAdminBlueprint(
@@ -273,9 +269,10 @@ def login():
 		print ("Opened database successfully")
 		curr = conn.cursor()
 		curr.execute('SELECT type1 FROM users where email = (?)',(current+"@iiita.ac.in",))
-		if curr.fetchone()[0]=="Student":
+		typeo = curr.fetchone()[0]
+		if typeo=="Student":
 			return redirect(url_for('dashboard',id = current))
-		if curr.fetchone()[0]=="Faculty":
+		elif typeo=="Faculty":
 			return redirect(url_for('facultydashboard',id = current))
 
 	if request.method == 'GET':
@@ -297,8 +294,8 @@ def login():
 		data = curr.fetchone()[0]
 		if data ==0:
 			print('There is no user%s'%request.form.get('username'))
-			message = "the user does not exists please register"
-		if data !=0:
+			message = "PLEASE REGISTER USER DOES NOT EXIST"
+		else:
 			print('Component %s found in %s row(s)'%(username,data))
 			curr.execute("SELECT count(*) FROM users WHERE email = (?) and is_active = (?)",(username,1))
 			check = curr.fetchone()[0]
@@ -306,8 +303,9 @@ def login():
 				return render_template("login.html",message = "Please verify your email first")
 
 			curr.execute("SELECT count(*) FROM users WHERE email = (?) and password = (?) and is_active = (?)",(username,password,1))
-			check = curr.fetchall()
-			if check != []:
+			check = curr.fetchall()[0]
+			print "the value of ----- :",check[0]
+			if check[0] != 0:
 				message = "success"
 				print ("success")
 				user=username.split("@")[0]
