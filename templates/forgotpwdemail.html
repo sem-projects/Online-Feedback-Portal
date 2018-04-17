@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Register Form</title>
+	<title>Confirm Email Form</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 <!--===============================================================================================-->	
@@ -34,44 +34,23 @@
 	{% if message is not none %}
     <h2>{{message}}</h2>
 	{% endif %}
-	<div class="limiter" style="opacity:0.98;height:100%;padding:10px;">
+	<div class="limiter" style="opacity:0.98;height:100%;padding:50px;">
 		<div class="container-login100" style="opacity:0.98;" >
-			<div class="wrap-login100" style="background:#3d4949;height: 670px;">
+			<div class="wrap-login100" style="background:#3d4949;height:300px;">
 				<form class="login100-form validate-form" method = "POST">
 					<span class="login100-form-title p-b-34 p-t-27" style="opacity:1">
-						Student Register
+						Forgot Password
 					</span>
 
 					<div class="wrap-input100 validate-input" data-validate = "Enter Name" style="opacity:1">
-						<label class="label">Name :</label> 
-						<input class="input100" type="text" name="name" >
+						<label class="label">E-mail :</label> 
+						<input class="input100" type="text" name="mail" >
 						<span class="focus-input100" data-placeholder="&#xf207;" style="opacity:1"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Enter Date Of Birth">
-						<label class="label">Date Of Birth :</label>
-						<input class="input100" type="date" name="dob" placeholder="">
-						<span class="focus-input100" data-placeholder="&#xf191;"></span>
-					</div>
-					<div class="wrap-input100 validate-input" data-validate="Enter Email">
-						<label class="label">E-mail :</label>
-						<input class="input100" type="email" name="email" >
-						<span class="focus-input100" data-placeholder="&#xf191;"></span>
-					</div>
-					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<label class="label">Password :</label>
-						<input class="input100" type="password" name="pass">
-						<span class="focus-input100" data-placeholder="&#xf191;"></span>
-					</div>
-					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<label class="label">Confirm Password :</label>
-						<input class="input100" type="password" name="passc">
-						<span class="focus-input100" data-placeholder="&#xf191;"></span>
 					</div>
 
 					<div class="container-login100-form-btn">
 						<button type = "submit" class="login100-form-btn">
-							Register Me!
+							Enter
 						</button>
 					</div>
 				</form>

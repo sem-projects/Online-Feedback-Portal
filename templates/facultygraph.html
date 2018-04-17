@@ -6,7 +6,7 @@
     <link rel="apple-touch-icon" sizes="76x76" href="../static/img/feedback.png" />
     <link rel="icon" type="image/png" href="../static/img/feedback.png" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <title>Faculty Dashboard</title>
+    <title>Feedback Analysis</title>
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
     <meta name="viewport" content="width=device-width" />
     <!-- Bootstrap core CSS     -->
@@ -102,7 +102,7 @@
                                          <div class="row">
                                               <div class="col-md-4" style="padding: 20px;text-align: center;font-size: 20px;">Choose Subject  :</div>
                                               <div class="col-md-4">
-                                                  <select name="sub" onchange="window.location.href='http://127.0.0.1:5000/feedbackanalysis?sub='+this.value" style="margin-top: 10px;height: 10px;width: 250px;">
+                                                  <select name="sub" onchange="window.location.href='http://127.0.0.1:5000/feedbackanalysis?sub='+this.value" style="margin-top: 10px;height: 30px;width: 250px;">
                                                         {% if select_subject is none %}<option value="None">Select</option>{% endif %}
                                                         {% for item in subject %}
                                                                         {% if select_subject is not none and select_subject in item[2] %}
@@ -123,13 +123,16 @@
                             <div class="col-md-4" style="padding: 10px;text-align: center;font-size: 20px;">Filter :</div> 
                             <div class="col-md-4"> 
                                 <select name="type1" style="margin-top: 0px;height: 30px;width: 250px;">
-                                {% if types is not none %}
+                                {% if select_type is none %}<option value="None">Select</option>{% endif %}
                                 {% for item in types %}
-                                            <option value="{{item}}">{{item}}</option>
+                                                {% if select_type is not none and select_type in item %}
+                                                <option value="{{item}}" selected=true>{{item}}</option>
+                                                {% else %}
+
+                                                <option value="{{item}}">{{item}}</option>
+                                                {% endif %}
+                                                
                                 {% endfor %}
-                                {% else %}
-                                <option value="">Choose Course First</option>
-                                {% endif %}
                                 </select>
                             </div>
                            </div>
@@ -165,8 +168,17 @@
                                            </div>
                                           <center><button type="submit" class="btn btn-primary ">Apply Filter</button></center>
                             </form>
-                       
-                        
+                            <br>
+                            {% if graph1 is not none %}
+                             <div class="content">
+                                <div class="container-fluid" style="border-color: #000;border-width: 2px;">
+                                    <div class="row">
+                                        <div class="col-md-4" id="graph2" style="width:90%;height:400px;">
+                                        </div>
+                                     </div>
+                                </div>
+                            </div>
+                         {% endif %}
                                 
                             </div>
                         </div>
@@ -212,6 +224,7 @@
 
         // Javascript method's body can be found in static/js/demos.js
         TESTER = document.getElementById('graph');
+        BAR = document.getElementById('graph2');
         var layout = {
           title: 'Rating Graph',
           xaxis: {

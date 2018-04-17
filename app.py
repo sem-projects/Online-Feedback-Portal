@@ -13,6 +13,7 @@ from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy 
 from werkzeug import secure_filename
 import json
+import tkMessageBox
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.sqlite3'
@@ -191,11 +192,11 @@ def new():
 
 
 app.config['MAIL_SERVER']='smtp.gmail.com'
-app.config['MAIL_PORT'] = 80
+app.config['MAIL_PORT'] = 587
 app.config['MAIL_USERNAME'] = 'iit2016047@iiita.ac.in'
 app.config['MAIL_PASSWORD'] = 'cricketstar'
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 
 mail = Mail(app)
 
@@ -389,6 +390,57 @@ def validemail(id,key):
 		conn.close()
 	return redirect(url_for('login'))
 
+@app.route('/forgotpwdemail',methods=['GET','POST'])
+def forgotpwdemail():
+	message = None
+	mails = None
+	if request.method == 'GET':
+		return render_template("forgotpwdemail.html", message = message)
+	if request.method == 'POST':
+		email = request.form.get('mail',)
+		if email.split("@")[1] != "iiita.ac.in":
+			message="Invalid Email."
+			return render_template("forgotpwdemail.html", message = message)
+		else:
+			mails=[]
+			conn = sqlite3.connect('students.sqlite3')
+			cur = conn.cursor()
+			cur.execute("SELECT count(*) from users where email = (?)",(email,))
+			mails = cur.fetchall()[0]
+			if mails==[]:
+				message="Email does not exist."
+				return render_template("forgotpwdemail.html", message = message)
+			else:
+				secret = random.randint(1000324312,10000000000123)
+				cur.execute("UPDATE users set secret_key = (?) where email = (?)",(secret,email,))
+				conn.commit() 
+				conn.close()
+				msg = Message('Hello', sender = 'iit2016047@iiita.ac.in', recipients = [email])
+				msg.body = "Click on the given link for changing password " + "http://127.0.0.1:5000/forgotpwd/"+email.split("@")[0]+"/"+str(secret)
+				mail.send(msg)
+				return redirect(url_for('login'))
+	return render_template("forgotpwdemail.html", message = message)
+
+@app.route('/forgotpwd/<id>/<key>',methods=['GET','POST'])
+def forgotpwd(id,key):
+	message = None
+	if request.method == 'GET':
+		return render_template("forgotpwd.html", message = message)
+	if request.method == 'POST':
+		new_pass = request.form.get('new_pass',)
+		confirm_pass = request.form.get('confirm_pass',)
+		conn = sqlite3.connect('students.sqlite3')
+		cur = conn.cursor()
+		if new_pass != confirm_pass:
+			message="Password does not match."
+			return render_template("forgotpwd.html", message = message)
+		else:
+			cur.execute("UPDATE users set password = (?) where username = (?) and secret_key = (?)",(new_pass,id,key,))
+			conn.commit()
+			conn.close()
+			message="Password changed you can login now."
+			return redirect(url_for('login'))
+	return render_template("forgotpwd.html", message = message)
 
 
 @app.route('/admin_course/add',methods=['GET','POST'])
@@ -427,7 +479,7 @@ def dashboard(id):
 		print (users)
 		print (courses)
 		cur = conn.cursor()
-		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?) and reply_to_query != (?)",(id+"@iiita.ac.in",0,None,))
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?) and reply_to_query != (?)",(id+"@iiita.ac.in",0,"None",))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
@@ -453,7 +505,7 @@ def facultydashboard(id):
 		print (users)
 		print (courses)
 		cur = conn.cursor()
-		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?) and reply_to_query!=(?)",(id+"@iiita.ac.in",0,"None",))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
@@ -471,7 +523,7 @@ def feedbackanalysis():
 		cur2 = conn.cursor()
 		cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 		users = cur.fetchone()
-		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?) and reply_to_query != (?)",(current+"@iiita.ac.in",0,"None",))
 		notifications = cur.fetchall()
 		cur.execute("SELECT * FROM users_courses where useremail = (?)",(current+"@iiita.ac.in",))
 		subject = cur.fetchall()
@@ -486,29 +538,31 @@ def feedbackanalysis():
 		data2=None
 		graph=None
 		year1=None
-		if request.method=="GET":
-			sub = request.args.get('sub')
-
-			cur.execute("SELECT * FROM courses where course_code = (?)",(sub,))
-			if cur.fetchall()!=[]:
-				cur.execute("SELECT * FROM users_courses where useremail = (?)",(current+"@iiita.ac.in",))
-				if cur.fetchall()==[]:
-					message = "Don't use foul means :p"
-				else:
-					if sub[-2:-1]!='0':
-						types.append('Lab')
-					select_subject=sub
-			else:
+		graph1=None
+		sub = request.args.get('sub')
+		select_subject=sub
+		select_type=None
+		cur.execute("SELECT * FROM courses where course_code = (?)",(sub,))
+		if cur.fetchall()!=[]:
+			cur.execute("SELECT * FROM users_courses where useremail = (?)",(current+"@iiita.ac.in",))
+			if cur.fetchall()==[]:
 				message = "Don't use foul means :p"
+			else:
+				if sub[-2:-1]!='0':
+					types.append('Lab')
+				select_subject=sub
+		else:
+			message = "Don't use foul means :p"
 		year = None
 		if request.method=="POST":
-			if request.form.get('type1',)=="Overall":
-				cur.execute('SELECT avg(rating) as average, strftime((?), date1) as year FROM rating WHERE faculty_email = (?) and course_code=(?) group by year',('%Y',current+"@iiita.ac.in",request.form.get('sub'),))
-				cur2.execute('SELECT strftime((?), date1) as year FROM rating WHERE faculty_email = (?) and course_code=(?) group by year',('%Y',current+"@iiita.ac.in",request.form.get('sub'),))	
-			elif request.form.get('type1',)=="Lab":
+			select_type = request.form.get('type1',)
+			if select_type=="Overall":
+				cur.execute('SELECT avg(rating) as average, strftime((?), date1) as year FROM rating WHERE faculty_email = (?) and course_code=(?) group by year',('%Y',current+"@iiita.ac.in",sub,))
+				cur2.execute('SELECT strftime((?), date1) as year FROM rating WHERE faculty_email = (?) and course_code=(?) group by year',('%Y',current+"@iiita.ac.in",sub,))	
+			elif select_type=="Lab":
 				cur2.execute('SELECT strftime((?), date1) as year FROM rating INNER JOIN questions ON rating.question_id=questions.S_no WHERE faculty_email = (?) and course_code=(?) and question_type=(?) group by year',('%Y',current+"@iiita.ac.in",sub,'Lab',))
 				cur.execute('SELECT avg(rating) as average,strftime((?), date1) as year FROM rating INNER JOIN questions ON rating.question_id=questions.S_no WHERE faculty_email = (?) and course_code=(?) and question_type=(?) group by year',('%Y',current+"@iiita.ac.in",sub,'Lab',))
-			elif request.form.get('type1',)=="Theory":
+			elif select_type=="Theory":
 				cur.execute('SELECT avg(rating) as average,strftime((?), date1) as year FROM rating INNER JOIN questions ON rating.question_id=questions.S_no WHERE faculty_email = (?) and course_code=(?) and question_type!=(?) group by year',('%Y',current+"@iiita.ac.in",sub,'Lab',))
 				cur2.execute('SELECT strftime((?), date1) as year FROM rating INNER JOIN questions ON rating.question_id=questions.S_no WHERE faculty_email = (?) and course_code=(?) and question_type!=(?) group by year',('%Y',current+"@iiita.ac.in",sub,'Lab',))
 			data = cur.fetchall()
@@ -517,6 +571,7 @@ def feedbackanalysis():
 			data1=[]
 			data2=[]
 			graph=True
+			graph1=True
 			year1=[]
 			temp = request.form.get('year1',)
 			print temp,'======='
@@ -525,12 +580,12 @@ def feedbackanalysis():
 				data1.append(d[1])
 			for y in year:
 				year1.append(y[0])
-         
+         	
 		if notifications==[]:
 			notifications=None
 
 
-		return render_template('facultygraph.html',year = year1,type1=type1,users=users,graph=graph,notifications=notifications,data1=json.dumps(data1),data2=json.dumps(data2),types=types,subject=subject,select_subject=select_subject,message=message)
+		return render_template('facultygraph.html',year = year1,type1=type1,users=users,graph1=graph1,graph=graph,notifications=notifications,data1=json.dumps(data1),data2=json.dumps(data2),types=types,subject=subject,select_type=select_type,select_subject=select_subject,message=message)
 	else:
 		return redirect(url_for('login'))
 
@@ -546,7 +601,7 @@ def profile(id=None):
 			cur = conn.cursor()
 			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 			users = cur.fetchone()
-			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
+			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?) and reply_to_query != (?)",(current+"@iiita.ac.in",0,'None'))
 			notifications = cur.fetchall()
 			if notifications==[]:
 				notifications=None
@@ -596,7 +651,7 @@ def courses():
 		users = cur.fetchone()
 		cur.execute("SELECT type1 from users where username = (?)",(current,))
 		type1 = cur.fetchone()[0]
-		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?) and reply_to_query != (?)",(current+"@iiita.ac.in",0,"None",))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
@@ -647,7 +702,7 @@ def query():
 			qu = request.form.get('query',)
 			print (qu)
 			cur.execute("INSERT INTO query (useremail,query,reply_to_query,seen) values (?,?,?,?)",\
-				(current+"@iiita.ac.in",qu,'None',0,))
+				(current+"@iiita.ac.in",qu,"None",0,))
 			conn.commit()
 			print ("query updated")
 			conn.close()
@@ -666,7 +721,7 @@ def feedback():
 		questions = cur.fetchall()
 		cur.execute("SELECT department FROM users WHERE username = (?)",(current,))
 		department = cur.fetchone()[0]
-		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(current+"@iiita.ac.in",0,))
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?) and reply_to_query!=(?)",(current+"@iiita.ac.in",0,"None",))
 		notifications = cur.fetchall()
 		if request.method == 'GET' :
 			
@@ -706,7 +761,8 @@ def feedback():
 			return render_template("feedback.html",type1=type1,questions = None,users = current,teachers = teachers,teacher=teacher,courses=courses,notifications=notifications)
 			
 		elif request.method == "POST":
-
+			if notifications==[]:
+				notifications=None
 			return redirect(url_for('question',f_id=request.form.get("pid",),s_id=current,c_id=request.form.get("course",)))
 
 		
@@ -726,7 +782,7 @@ def question(f_id,s_id,c_id):
 		users = cur.fetchone()
 		cur.execute("SELECT * from questions")
 		questions = cur.fetchall()
-		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(s_id+"@iiita.ac.in",0,))
+		cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?) and reply_to_query !=(?)",(s_id+"@iiita.ac.in",0,"None",))
 		notifications = cur.fetchall()
 		if notifications==[]:
 			notifications=None
@@ -791,7 +847,7 @@ def change_password(id):
 			cur = conn.cursor()
 			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 			users = cur.fetchone()
-			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
+			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?) and reply_to_query != (?)",(id+"@iiita.ac.in",0,"None",))
 			notifications = cur.fetchall()
 			if notifications==[]:
 				notifications=None
@@ -802,7 +858,7 @@ def change_password(id):
 			cur = conn.cursor()
 			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
 			users = cur.fetchone()
-			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
+			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?) and reply_to_query !=(?)",(id+"@iiita.ac.in",0,"None",))
 			notifications = cur.fetchall()
 			if notifications==[]:
 				notifications=None
