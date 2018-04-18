@@ -539,9 +539,15 @@ def feedbackanalysis():
 		graph=None
 		year1=None
 		graph1=None
+		r1 = 0
+		r2 = 0
+		r3 = 0
+		r4 = 0
+		r5 = 0
 		sub = request.args.get('sub')
 		select_subject=sub
 		select_type=None
+		temp=None
 		cur.execute("SELECT * FROM courses where course_code = (?)",(sub,))
 		if cur.fetchall()!=[]:
 			cur.execute("SELECT * FROM users_courses where useremail = (?)",(current+"@iiita.ac.in",))
@@ -555,6 +561,8 @@ def feedbackanalysis():
 			message = "Don't use foul means :p"
 		year = None
 		if request.method=="POST":
+			graph1=None
+			temp=None
 			select_type = request.form.get('type1',)
 			if select_type=="Overall":
 				cur.execute('SELECT avg(rating) as average, strftime((?), date1) as year FROM rating WHERE faculty_email = (?) and course_code=(?) group by year',('%Y',current+"@iiita.ac.in",sub,))
@@ -571,9 +579,21 @@ def feedbackanalysis():
 			data1=[]
 			data2=[]
 			graph=True
-			graph1=True
 			year1=[]
 			temp = request.form.get('year1',)
+			if temp!= None:
+				graph1 = True
+				cur.execute('SELECT count(rating) FROM rating WHERE strftime((?), date1) = (?) and faculty_email = (?) and course_code=(?) and rating = 1',('%Y',temp,current+"@iiita.ac.in",sub,))
+				r1 = cur.fetchone()[0]
+				cur.execute('SELECT count(rating) FROM rating WHERE strftime((?), date1) = (?) and faculty_email = (?) and course_code=(?) and rating = 2',('%Y',temp,current+"@iiita.ac.in",sub,))
+				r2 = cur.fetchone()[0]
+				cur.execute('SELECT count(rating) FROM rating WHERE strftime((?), date1) = (?) and faculty_email = (?) and course_code=(?) and rating = 3',('%Y',temp,current+"@iiita.ac.in",sub,))
+				r3 = cur.fetchone()[0]
+				cur.execute('SELECT count(rating) FROM rating WHERE strftime((?), date1) = (?) and faculty_email = (?) and course_code=(?) and rating = 4',('%Y',temp,current+"@iiita.ac.in",sub,))
+				r4 = cur.fetchone()[0]
+				cur.execute('SELECT count(rating) FROM rating WHERE strftime((?), date1) = (?) and faculty_email = (?) and course_code=(?) and rating = 5',('%Y',temp,current+"@iiita.ac.in",sub,))
+				r5 = cur.fetchone()[0]
+				
 			print temp,'======='
 			for d in data:
 				data2.append(d[0])
@@ -585,7 +605,7 @@ def feedbackanalysis():
 			notifications=None
 
 
-		return render_template('facultygraph.html',year = year1,type1=type1,users=users,graph1=graph1,graph=graph,notifications=notifications,data1=json.dumps(data1),data2=json.dumps(data2),types=types,subject=subject,select_type=select_type,select_subject=select_subject,message=message)
+		return render_template('facultygraph.html',r1=r1,r2=r2,r3=r3,r4=r4,r5=r5,year = year1,type1=type1,users=users,graph1=graph1,graph=graph,notifications=notifications,data1=json.dumps(data1),data2=json.dumps(data2),types=types,temp=temp,subject=subject,select_type=select_type,select_subject=select_subject,message=message)
 	else:
 		return redirect(url_for('login'))
 
@@ -612,12 +632,6 @@ def profile(id=None):
 		if request.method == 'POST':
 			conn = sqlite3.connect('students.sqlite3')
 			cur = conn.cursor()
-			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
-			users = cur.fetchone()
-			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
-			notifications = cur.fetchall()
-			if notifications==[]:
-				notifications=None
 			nm = request.form.get('name',)
 			email=request.form.get('mail',)
 			dob = str(request.form.get('dob',))
@@ -635,6 +649,12 @@ def profile(id=None):
 			message = "profile editied successfully"
 			cur.execute("UPDATE users SET name = (?) , dob = (?) , semester = (?) , department = (?), image_link = (?) WHERE username = (?)",(nm,dob,sem,depart,img,current,))
 			conn.commit()
+			cur.execute("SELECT * FROM users WHERE username = (?)",(current,))
+			users = cur.fetchone()
+			cur.execute("SELECT * FROM query WHERE useremail = (?) and seen = (?)",(id+"@iiita.ac.in",0,))
+			notifications = cur.fetchall()
+			if notifications==[]:
+				notifications=None
 			conn.close()
 			return render_template("user.html",type1=type1,users=users,notifications=notifications,message=message)
 	

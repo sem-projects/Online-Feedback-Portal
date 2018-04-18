@@ -97,7 +97,7 @@
                                     <h4 class="title">Analyze your Feedback</h4>
                                     <p class="category">Check the feedback given to you!!</p>
                                 </div>
-            <div class="card-content">
+                                <div class="card-content">
                                      <form method="POST" action="">
                                          <div class="row">
                                               <div class="col-md-4" style="padding: 20px;text-align: center;font-size: 20px;">Choose Subject  :</div>
@@ -150,24 +150,28 @@
                                  </div>
                             </div>
                         </div>
-                         {% endif %}
                         
                                          <div class="row">
                                             <div class="col-md-4" style="padding: 10px;text-align: center;font-size: 20px;">Select Year :</div> 
                                                   <div class="col-md-4"> 
                                                      <select name="year1" style="margin-top: 0px;height: 30px;width: 250px;">
-                                                        {% if year is not none %}
-                                                             {% for item in year %}
+                                                        {% if temp is none %}<option value="None">Select Year</option>{% endif %}
+                                                         {% for item in year %}
+                                                             {% if temp is not none and temp in item %}
+                                                                 <option value="{{item}}" selected=true>{{item}}</option>
+                                                             {% else %}
                                                                 <option value="{{item}}">{{item}}</option>
-                                                             {% endfor %}
-                                                        {% else %}
-                                                             <option value="">Choose Year first</option>
-                                                        {% endif %}
+                                                             {% endif %}
+                                                         {% endfor %}
+                                                        
+                                               
                                                      </select>
                                                  </div>
                                            </div>
                                           <center><button type="submit" class="btn btn-primary ">Apply Filter</button></center>
-                            </form>
+                            
+                            {% endif %}
+                        </form>
                             <br>
                             {% if graph1 is not none %}
                              <div class="content">
@@ -266,12 +270,44 @@
 
         BAR = document.getElementById('graph2');
         var barlayout = {
-             type: 'bar'
+            title: 'Number of Ratings Bar Graph',
+          xaxis: {
+            title: 'Rating',
+            titlefont: {
+              family: 'Courier New, monospace',
+              size: 18,
+              color: '#7f7f7f'
+            },
+            rangemode: 'nonnegative',
+            zeroline: true,
+            showline: true,
+            zerolinecolor: '#969696',
+            zerolinewidth: 4,
+            linecolor: '#636363',
+            linewidth: 6
+          },
+          yaxis: {
+            title: 'Number of Ratings',
+            titlefont: {
+              family: 'Courier New, monospace',
+              size: 18,
+              color: '#7f7f7f'
+            },
+            rangemode: 'nonnegative',
+            zeroline: true,
+            showline: true,
+            zerolinecolor: '#969696',
+            zerolinewidth: 4,
+            linecolor: '#636363',
+            linewidth: 6
+          }
+            
         };
         Plotly.plot(BAR,[{
             x: ['1','2','3','4','5'],
-            y: [5,5,5,5,5],
-            type:'bar'
+            y: [{{r1}},{{r2}},{{r3}},{{r4}},{{r5}}],
+            type:'bar',
+            width : [0.5,0.5,0.5,0.5,0.5]
         }], barlayout);
 
 
