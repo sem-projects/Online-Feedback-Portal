@@ -139,7 +139,7 @@
                           <br>
                           <br>
                           <center><button type="submit" class="btn btn-primary ">Check Your Feedback</button></center>
-                        </form>
+                        
                         <br>
                          {% if graph is not none %}
                          <div class="content">
@@ -151,7 +151,7 @@
                             </div>
                         </div>
                          {% endif %}
-                        <form method="POST" action="">
+                        
                                          <div class="row">
                                             <div class="col-md-4" style="padding: 10px;text-align: center;font-size: 20px;">Select Year :</div> 
                                                   <div class="col-md-4"> 
@@ -224,7 +224,7 @@
 
         // Javascript method's body can be found in static/js/demos.js
         TESTER = document.getElementById('graph');
-        BAR = document.getElementById('graph2');
+        
         var layout = {
           title: 'Rating Graph',
           xaxis: {
@@ -263,6 +263,17 @@
         Plotly.plot( TESTER, [{
             x: {{data1|safe}},
             y: {{data2|safe}} }],layout);
+
+        BAR = document.getElementById('graph2');
+        var barlayout = {
+             type: 'bar'
+        };
+        Plotly.plot(BAR,[{
+            x: ['1','2','3','4','5'],
+            y: [5,5,5,5,5],
+            type:'bar'
+        }], barlayout);
+
 
 
         /* Current Plotly.js version */
